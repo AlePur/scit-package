@@ -1,0 +1,30 @@
+# ignore data (can be large files)
+data/**
+#!data/shared
+#data/shared/*
+
+**/__pycache__
+**/__old
+src/**/*.c
+src/**/*.cpp
+src/**/*.so
+
+docs/build/
+venv/
+
+trash
+trash/**
+#typings/**
+.typings/**
+
+.vscode
+.toolkit-project/*
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml

@@ -1,0 +1,34 @@
+from anndata import AnnData
+import anndata as ad
+
+from scipy.sparse import csr_matrix
+from ._metadata import add_metadata
+from .._utils import ArgAssert
+from ..tools._layers import LayerConfig
+
+def transpose_anndata(
+        adata: AnnData,
+        layers: list[LayerConfig],
+        n_features: int,
+        *,
+        copy_var: bool = True
+) -> AnnData:
+    """
+    Parameters
+    ----------
+    adata
+    layers
+        layer to transpose in new data
+    """
+    X = csr_matrix((n_features, adata.shape[0]))
+    tdata = ad.AnnData(X)
+    for lc in layers:
+        _X = lc.transform(adata, raw_view=True)
+        tdata.layers[lc.layer] = _X.T
+
+    if copy_var:
+        tdata.obs = adata.var.copy()
+    tdata.var = adata.obs.copy()
+    #add_metadata(tdata, var_loc_metadata=False)
+
+    return tdata

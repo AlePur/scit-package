@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sparscit"
+version = "0.1.0"
+description = "NanoC&T Processing"
+readme = "README.md"
+requires-python = ">=3.10"
+dynamic = ["dependencies"]        # Tells setuptools to read dependencies dynamically
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]} # Automatically reads your requirements file
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,8 +1,10 @@
-Advanced
-========
+Advanced (``sparscit.adv``)
+============================
 
-Tools that are used for advanced analysis, that might not be relevant for all experiments.
-This submodule contains functions for landscape analysis.
+Advanced analysis tools for landscape dynamics, HMMs, grid-based analysis,
+and enrichment classification. This submodule contains functions that may not
+be relevant for all experiments but provide powerful capabilities for in-depth
+analysis.
 
 .. toctree::
    :maxdepth: 4

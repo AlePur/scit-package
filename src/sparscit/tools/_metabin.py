@@ -17,7 +17,27 @@ def membership_summary(
         use_cached_mask: bool = True,
 ) -> dict:
     """
-    Summarize data 
+    Summarize data by categorical membership groups.
+
+    Parameters
+    ----------
+    adata
+        AnnData object to summarize
+    layer_config
+        LayerConfig defining the data transformation
+    obs_key
+        Key in `.obs` for categorical membership groups
+    anti_summary
+        If True, compute the anti-summary (complement)
+    normalize_per_class_obs_key
+        If provided, normalize per class defined by this `.obs` key
+    use_cached_mask
+        Whether to use cached feature mask from the LayerConfig
+
+    Returns
+    -------
+    dict
+        Dictionary mapping category names to sparse matrices of summarized data
     """
 
     #    normalize_per_obs_category

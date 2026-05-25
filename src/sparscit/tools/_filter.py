@@ -19,21 +19,30 @@ def filter(
         filter_iteratively: bool = True
 ) -> AnnData | None:
     """
+    Filter cells and features by count thresholds.
+
     Parameters
     ----------
     adata
+        AnnData object to filter
     layers
-        Which layers to consider
+        Which layers to consider for count thresholds
     min_obs_counts, max_obs_counts, min_var_counts, max_var_counts
-        If `None`, don't create filter based on min/max counts. List with one integer for each layer. If a complex number between 0 and 100 is provided, this is the percentile cutoff.
+        If `None`, don't create filter based on min/max counts. List with one integer
+        for each layer. If a complex number between 0 and 100 is provided, this is
+        interpreted as the percentile cutoff.
     filter_iteratively
-        Iterate until filters thresholds are enforced
+        Iterate until filter thresholds are enforced
     return_purged
-        Whether cells not passing the filter are removed from the anndata. The new filtered anndata is returned
+        Whether cells not passing the filter are removed from the anndata.
+        The new filtered anndata is returned
 
     Returns
     -------
-    `adata.obs['exclude']`, `adata.var['exclude']` and filtered adata if `return_purged == True`
+    `adata.obs['exclude']`, `adata.var['exclude']`
+        Boolean masks for excluded observations and variables
+    filtered adata
+        If `return_purged == True`, returns a filtered AnnData object
     """
     obs_mask = np.full((adata.shape[0],), True)
     var_mask = np.full((adata.shape[1],), True)

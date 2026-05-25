@@ -23,7 +23,14 @@ def X_to_layer(
         layer_name: str
 ) -> None:
     """
-    Move X to .layers. Note! This replaces X with an empty csr matrix
+    Move `.X` to `.layers`. Note: this replaces `.X` with an empty CSR matrix.
+
+    Parameters
+    ----------
+    adata
+        AnnData object
+    layer_name
+        Name for the new layer
     """
     if (layer_name in adata.layers.keys()):
         logging.warning("Overwriting layer...")
@@ -40,15 +47,16 @@ def stack_adata(
         keep: int = 0
 ) -> AnnData:
     """
-    Add adata.X from each adata in adatas as a layer
+    Add `.X` from each AnnData in `adatas` as a layer.
 
     Parameters
     ----------
     adatas
+        List of AnnData objects to stack
     layer_names
-        List of layer that adatas will form
+        List of layer names that each AnnData will form
     keep
-        Index of the adata that will be used as base for adding layers
+        Index of the AnnData that will be used as base for adding layers
 
     Returns
     -------

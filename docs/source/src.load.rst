@@ -1,7 +1,9 @@
-Loading Utilities
-=================
+Loading Utilities (``sparscit.ld``)
+====================================
 
-Utilities for loading files.
+Utilities for loading raw data and reference files into AnnData objects.
+This module handles fragment files, GTF gene annotations, GO term ontologies,
+and regulatory link annotations.
 
 .. automodule:: src.load
    :members:

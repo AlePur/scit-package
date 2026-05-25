@@ -1,12 +1,15 @@
-API
-===
+API Reference
+=============
 
-In this section,
-all functions included within the submodules
-are briefly described, as well as all their parameters
-
+This section provides detailed documentation for all public functions and classes
+in each of SparSCit's submodules.
 
 .. toctree::
    :maxdepth: 4
 
-   src
+   src.load
+   src.tools
+   src.graph
+   src.embedding
+   src.plotting
+   src.advanced

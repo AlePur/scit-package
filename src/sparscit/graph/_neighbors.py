@@ -23,14 +23,16 @@ def _neighbor_graph(
     Parameters
     ----------
     adata
+        AnnData object with distances in `.obsp`
     directed
         Whether graph will be directed or not
     obsp_key
-        Key in .obsp to use for cell-to-cell connectivities
+        Key in `.obsp` to use for cell-to-cell connectivities
 
     Returns
     -------
     :class:`Graph`
+        A Graph object built from the connectivity matrix
 
     """
     if obsp_key is None:
@@ -51,12 +53,14 @@ def enn(
         metric: Metric = "euclidean"
 ) -> None:
     """\
-    Calculate epsilon NN using :class:`sklearn.neighbors.RadiusNeighborsTransformer`
+    Calculate epsilon nearest neighbors using :class:`sklearn.neighbors.RadiusNeighborsTransformer`
 
     Parameters
     ----------
     adata
+        AnnData object with embedding in `.obsm`
     embedding_key
+        Key in `.obsm` for the embedding to use
     epsilon
         Radius of neighborhood for including neighbors
     metric
@@ -65,6 +69,7 @@ def enn(
     Returns
     -------
     `adata.obsp['epsilon_distances']`
+        Sparse distance matrix of epsilon-nearest neighbors
     """
 
     ArgAssert(embedding_key in adata.obsm.keys(), "embedding_key not in .obsm")
@@ -95,15 +100,17 @@ def knn(
         metric: Metric = "euclidean"
 ) -> None:
     """\
-    Calculate kNN using :class:`sklearn.neighbors.KNeighborsTransformer`.
+    Calculate k-nearest neighbors using :class:`sklearn.neighbors.KNeighborsTransformer`.
     In addition, calculate connectivities using :func:`UMAP.fuzzy_simplicial_set`
 
     Parameters
     ----------
     adata
+        AnnData object with embedding in `.obsm`
     embedding_key
+        Key in `.obsm` for the embedding to use
     add_connectivities
-        Whether to calculate connectivities and save them in .obsp
+        Whether to calculate connectivities and save them in `.obsp`
     n_neighbors
         Number of neighbors to calculate
     metric
@@ -111,7 +118,10 @@ def knn(
 
     Returns
     -------
-    `adata.obsp['distances']`, `adata.obsp['connectivities']`
+    `adata.obsp['distances']`
+        Sparse distance matrix of k-nearest neighbors
+    `adata.obsp['connectivities']`
+        Fuzzy simplicial set connectivities (only if `add_connectivities=True`)
     """
 
     ArgAssert(embedding_key in adata.obsm.keys(), "embedding_key not in .obsm")
@@ -164,21 +174,29 @@ def knn_impute(
         normalize_with_obs_counts: bool = True
 ) -> None:
     """
-    Impute data using kNN.
+    Impute data using k-nearest neighbors.
 
     Parameters
     ----------
     adata
+        AnnData object with neighbor graph in `.obsp`
     layers
         List of layer names to impute
     impute_strength
-        Influence of neighboring cell counts on each cell. This value reflects how many times influence the imputed counts have compared to original counts. For example, impute_strength = 2.0 implies imputed values account for 2/3 of final counts while 1/3 is the original cell counts
+        Influence of neighboring cell counts on each cell. This value reflects how many
+        times influence the imputed counts have compared to original counts. For example,
+        impute_strength = 2.0 implies imputed values account for 2/3 of final counts while
+        1/3 is the original cell counts
+    density_normalize
+        Whether to density-normalize the connectivity matrix before imputation
+    obsp_key
+        Key in `.obsp` for the connectivity matrix to use
     normalize_with_obs_counts
         Whether to normalize layer before imputing
-        
+
     Returns
     -------
-    `adata.layers['imputed_<layer>']` for layer in layers
+    `adata.layers['imputed_<layer>']` for each layer in layers
     """
     impute_strength = float(impute_strength)
     ArgAssert(impute_strength < 1, 'Impute strength has to be in range (0.0, 1.0)')

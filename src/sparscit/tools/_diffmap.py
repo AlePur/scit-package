@@ -8,7 +8,7 @@ from .._logging import logging
 
 class Diffmap:
     """
-    Scanpy implementation of Hierarchical Diffusion Pseudotime.
+    Diffusion map computation for single-cell data.
     """
 
     def __init__(
@@ -55,7 +55,6 @@ class Diffmap:
             random_state: int = 0,
     ):
         """\
-        Scanpy.
         Compute eigen decomposition of transition matrix.
 
         Parameters
@@ -63,6 +62,8 @@ class Diffmap:
         n_comps
             Number of eigenvalues/vectors to be computed, set `n_comps = 0` if
             you need all eigenvectors.
+        sort_increase
+            Whether to sort eigenvalues in increasing order
         random_state
             A numpy random seed
 
@@ -73,9 +74,9 @@ class Diffmap:
         eigen_values : :class:`~numpy.ndarray`
             Eigenvalues of transition matrix.
         eigen_basis : :class:`~numpy.ndarray`
-            Matrix of eigenvectors (stored in columns).  `.eigen_basis` is
+            Matrix of eigenvectors (stored in columns). `.eigen_basis` is
             projection of data matrix on right eigenvectors, that is, the
-            projection on the diffusion components.  these are simply the
+            projection on the diffusion components. These are simply the
             components of the right eigenvectors and can directly be used for
             plotting.
         """
@@ -114,21 +115,27 @@ def diffmap(
         random_state: int = 0
 ) -> np.ndarray:
     """
-    Diffusion maps. Modified from scanpy
+    Compute diffusion maps.
 
     Parameters
     ----------
     adata
-    graph
+        AnnData object with connectivities in `.obsp`
+    obsp_key
+        Key in `.obsp` for the connectivity matrix
     n_comps
-        Components number
+        Number of diffusion components to compute
     random_state
+        Random seed for eigen decomposition
 
     Returns
     -------
     eigen_values
         Eigenvalues for each component
-    adata.uns['X_diffmap']
+    `adata.obsm['X_diffmap']`
+        Diffusion map embedding
+    `adata.uns['X_diffmap_evals']`
+        Eigenvalues stored in `.uns`
     """
     
     dpt = Diffmap(adata.obsp[obsp_key])
@@ -144,13 +151,15 @@ def diffusion_pseudotime(
         root_cell: int
 ) -> None:
     """\
-    Scanpy python package implementation of diffusion pseudotime.
-    Infer progression of cells through geodesic distance along the graph
-    :cite:p:`Haghverdi2016,Wolf2019`.
+    Compute diffusion pseudotime (DPT).
+
+    Infer progression of cells through geodesic distance along the graph.
+    Based on Haghverdi et al. (2016) and Wolf et al. (2019).
 
     Parameters
     ----------
     adata
+        AnnData object with diffusion map in `.obsm['X_diffmap']` and distances in `.obsp['distances']`
     root_cell
         Root cell index
 

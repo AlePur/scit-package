@@ -20,8 +20,10 @@ def pca(
 
     Parameters
     ----------
+    adata
+        AnnData object
     embedding_key
-        Key of embedding in .obsm to transform
+        Key of embedding in `.obsm` to transform
     layer_key
         Alternatively, a layer can be transformed if this key is provided
     n_components
@@ -31,9 +33,9 @@ def pca(
     -------
     `adata.obsm['X_pca']`
         PCA embedding
-    
+
     variance_ratio
-        Variance ratio which can be plotted with :func:`toolkit.pl.explained_variance_ratio`
+        Variance ratio which can be plotted with :func:`sparscit.pl.explained_variance_ratio`
     """
 
     warn_overwrite('X_pca', adata.obsm)

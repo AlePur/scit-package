@@ -15,16 +15,19 @@ def umap(
 
     Parameters
     ----------
+    adata
+        AnnData object with embedding in `.obsm`
     embedding_key
-        Which embedding to transform in .obsm
+        Which embedding to transform in `.obsm`
     n_neighbors
         Number of neighbors to consider for calculating UMAP
+    umap_kwargs
+        Additional keyword arguments passed to :class:`umap.UMAP`
 
     Returns
     -------
     `adata.obsm["X_umap"]`
         UMAP embedding
-     
     """
 
     from umap import UMAP

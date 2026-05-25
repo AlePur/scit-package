@@ -1,6 +1,15 @@
 class Config:
     """\
-    Global settings
+    Global settings for SparSCit.
+
+    Attributes
+    ----------
+    n_jobs : int
+        Number of parallel jobs (-1 for all cores)
+    DEBUG : bool
+        Whether to enable debug mode
+    figsize : tuple[int, int]
+        Default figure size for all plots
     """
     n_jobs: int
     DEBUG: bool
@@ -21,14 +30,18 @@ def set_defaults(
         use_constrained_layout: bool | None = None
 ) -> None:
     """
-    Change settings
+    Change global settings for SparSCit.
 
     Parameters
     ----------
     n_jobs
-    use_constrained_layout
+        Number of parallel jobs (-1 for all cores)
+    DEBUG
+        Whether to enable debug mode
     figsize
-        Default figsize for all figures
+        Default figure size for all plots
+    use_constrained_layout
+        Whether to use constrained layout for matplotlib figures
     """
     if n_jobs is not None:
         settings.n_jobs = n_jobs

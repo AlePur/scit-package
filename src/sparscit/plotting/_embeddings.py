@@ -68,17 +68,19 @@ def embedding2d(
         show: bool = True,
 ) -> Figure | None:
     """\
-    Plot a 2d embedding
+    Plot a 2D embedding
 
     Parameters
     ----------
     adata
+        AnnData object with embedding in `.obsm`
     embedding_key
         Key at which embedding is stored in `adata.obsm`
     color
         Column in `adata.obs` used for coloring
     first_pcs_only
-        If this is True, the function can plot embeddings with more than 2 dimensions. It simply plots the first two dimensions
+        If True, the function can plot embeddings with more than 2 dimensions.
+        It simply plots the first two dimensions
     size
         Size of one cell on the plot
     alpha
@@ -86,8 +88,8 @@ def embedding2d(
     sort_order
         If color is numerical, sorting will place higher values on top of lower ones
     vminmax
-        Tuple of vmin and vmax for numerical plotting
-    cmap 
+        Tuple of (vmin, vmax) for numerical plotting
+    cmap
         Matplotlib colormap for plotting
     black_background
         Use dark background
@@ -98,18 +100,22 @@ def embedding2d(
     title
         Title of plot
     draw_ontop
-        Draw ontop of provided figure
+        Draw on top of provided figure
     mask
         Mask cells based on boolean array
     mask_style_dict
         Cells that are not selected by mask are given these style parameters
     include_arrows
-        Include arrows from .uns['arrows']
+        Include arrows from `.uns['arrows']`
     arrow_style_dict
         Arrow styles kwargs
     show
         Show plot
-        
+
+    Returns
+    -------
+    :class:`matplotlib.figure.Figure` or None
+        Figure object if `show=False`, otherwise None
     """
     arrow_style_dict = arrow_style_dict.copy()
     mask_style_dict = mask_style_dict.copy()

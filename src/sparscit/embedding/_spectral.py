@@ -68,10 +68,16 @@ def spectral(
 
     Parameters
     ----------
+    adata
+        AnnData object with data in `.layers`
     layer
-        Layer key for spectral
+        Layer key for spectral embedding
     n_components
-        Number of components to generate.
+        Number of components to generate
+    use_all_features
+        Whether to use all features (ignoring `.var['exclude']`)
+    weighted_by_sd
+        Whether to weight eigenvectors by the square root of eigenvalues
 
     Returns
     -------
@@ -79,7 +85,7 @@ def spectral(
         Embedding of dimensions (n, n_components)
 
     eigenvalues
-        Eigenvalues that can be plotted with :func:`pl.explained_variance_ratio`
+        Eigenvalues that can be plotted with :func:`sparscit.pl.explained_variance_ratio`
     """
     var_mask = np.full((adata.shape[1],), True)
     if not use_all_features:
@@ -110,14 +116,22 @@ def multiview_spectral(
 
     Parameters
     ----------
+    adata
+        AnnData object with data in `.layers`
+    layers
+        List of layer keys to use for multi-view embedding
     layer_weights
-        List of floats with layer importances
+        List of floats with layer importances. If None, equal weights are used
     n_components
-        Number of components to generate.
+        Number of components to generate
     random_seed
         Random seed for sampling data. If set to None, a seed is generated internally
+    use_all_features
+        Whether to use all features (ignoring `.var['exclude']`)
     skip_idf
-        Skip idf. This is not recommended!
+        Skip IDF transformation. This is not recommended!
+    weighted_by_sd
+        Whether to weight eigenvectors by the square root of eigenvalues
 
     Returns
     -------
@@ -125,7 +139,7 @@ def multiview_spectral(
         Embedding of dimensions (n, n_components)
 
     eigenvalues
-        Eigenvalues that can be plotted with :func:`pl.explained_variance_ratio`
+        Eigenvalues that can be plotted with :func:`sparscit.pl.explained_variance_ratio`
     """
 
     var_mask = np.full((adata.shape[1],), True)

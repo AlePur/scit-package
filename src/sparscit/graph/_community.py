@@ -25,20 +25,22 @@ def community_hierarchy(
     Parameters
     ----------
     adata
-    graph
+        AnnData object with neighbor graph in `.obsp`
     community_key
-        Key in .obs for community memberships
+        Key in `.obs` for community memberships
+    obsp_key
+        Key in `.obsp` for connectivity matrix. If None, uses 'connectivities'
 
     Returns
     -------
     `adata.uns['community_tree']['base']`
         Number of original clusters
     `adata.uns['community_tree']['linkage']`
-        Linkage matrix that can be plotted with :func:`toolkit.pl.community_dendrogram` or with :func:`scipy.cluster.hierarchical.dendrogram`
+        Linkage matrix that can be plotted with :func:`sparscit.adv.pl.community_dendrogram` or with :func:`scipy.cluster.hierarchy.dendrogram`
     `adata.uns['community_tree']['order']`
         Optimal order of clusters (minimized linear edge distance)
     `adata.uns['community_tree']['obs_key']`
-        Key in .obs identifying cluster membership on single cell resolution
+        Key in `.obs` identifying cluster membership on single cell resolution
 
     """
     graph = _neighbor_graph(adata, obsp_key=obsp_key)
@@ -67,11 +69,13 @@ def leiden(
 
     Parameters
     ----------
-    graph
     adata
+        AnnData object with neighbor graph in `.obsp`
     resolution
-        Resolution of leiden algorithm. Higher resolutions lead to more smaller communities,\
+        Resolution of leiden algorithm. Higher resolutions lead to more smaller communities,
         while lower resolutions lead to fewer larger communities.
+    obsp_key
+        Key in `.obsp` for connectivity matrix
     random_seed
         Random seed for leiden
     return_raw
@@ -82,7 +86,7 @@ def leiden(
     Returns
     -------
     `adata.obs['leiden']`
-        Community membership 
+        Community membership
     """
     graph = _neighbor_graph(adata, obsp_key=obsp_key)
     graph._check_graph(adata)

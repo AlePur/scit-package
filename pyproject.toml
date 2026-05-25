@@ -12,6 +12,3 @@ dynamic = ["dependencies"]        # Tells setuptools to read dependencies dynami
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]} # Automatically reads your requirements file
-
-[tool.setuptools.packages.find]
-where = ["src"]

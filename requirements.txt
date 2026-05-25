@@ -10,6 +10,6 @@ jax==0.8.0
 igraph
 optax
 statsmodels
-cython
+Cython
 goatools
 matplotlib_venn

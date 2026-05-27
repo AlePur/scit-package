@@ -86,6 +86,26 @@ def cocluster_summaries(
         *,
         n_components: int = 2
 ) -> np.ndarray:
+    """Co-cluster features using spectral biclustering on summary data.
+
+    Applies spectral biclustering to the feature-by-category matrix of a
+    single modality and returns reordered cluster labels for features.
+
+    Parameters
+    ----------
+    data
+        Nested dict of {modality: {category: sparse_matrix}} summaries
+    modality
+        Which modality key to use from ``data``
+    log_transform
+        Apply ``log1p(100 * x)`` before clustering
+    n_components
+        Number of biclusters (must match number of categories)
+
+    Returns
+    -------
+    Array of cluster labels for each feature
+    """
     n_cl = len(next(iter(data.values())).keys())
     data = deepcopy(data)
     keys = list(data.keys())
@@ -119,6 +139,26 @@ def cluster_summaries(
         *,
         n_components: int = 2
 ) -> np.ndarray:
+    """Cluster features based on their summary profiles across modalities.
+
+    Reduces each modality's feature-by-category matrix with PCA, then
+    applies KMeans to obtain cluster assignments.
+
+    Parameters
+    ----------
+    data
+        Nested dict of {modality: {category: sparse_matrix}} summaries
+    n_clusters
+        Number of KMeans clusters
+    log_transform
+        Apply ``log1p(100 * x)`` before PCA
+    n_components
+        Number of PCA components used as KMeans input
+
+    Returns
+    -------
+    Array of cluster labels for each feature
+    """
 
     #  n_mod = len(list(data.keys()))
     

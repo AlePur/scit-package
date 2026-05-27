@@ -118,11 +118,12 @@ def remove_pc(
         index: int
 ) -> None:
     """
-    Remove PC from embedding. This is useful when a PC is highly correlated with total counts
+    Remove PC from embedding. This is useful when a PC is highly correlated with total counts.
 
     Parameters
     ----------
     adata
+        Annotated data matrix
     embedding_key
         Embedding in .obsm to modify
     index

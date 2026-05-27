@@ -17,7 +17,8 @@ def get_genome_dict(
 
     Returns
     -------
-
+    dict
+        Dictionary mapping chromosome names to their lengths in base pairs
     """
     if name == 'DM6':
         return {

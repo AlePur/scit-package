@@ -14,12 +14,49 @@ from .._logging import logging
 mode_type = Literal['add', 'subtract']
 
 def _format_var_names(fn) -> np.ndarray:
+    """Convert feature names to a numpy array if not already."""
     if isinstance(fn, list):
         return np.array(fn)
     elif fn is not None:
         return np.array(list(fn))
 
 class LayerConfig:
+    """
+    Configuration for a data layer in an AnnData object, specifying transformations
+    and feature selection to apply when the layer is accessed.
+
+    Stores normalization, transformation, and feature masking options. Use
+    :func:`make_layer_config` to construct instances with defaults.
+
+    Attributes
+    ----------
+    layer : str
+        Key of the layer in ``adata.layers`` or ``adata.obsm``
+    normalize_with_obs_counts : bool
+        Whether to normalize by per-observation (cell) total counts
+    log_transform : bool
+        Whether to apply ``np.log1p`` transformation
+    norm_total : float
+        Scaling factor after count normalization
+    feature_active_threshold : float | None
+        Threshold for binarizing features as "active"
+    in_obsm : bool
+        If True, look up the layer in ``adata.obsm`` instead of ``adata.layers``
+    feature_names : np.ndarray | None
+        Names of all features in the layer
+    normalize_with_l2_norm : bool
+        Whether to normalize by L2 norm per observation
+    idf_transform : bool
+        Whether to apply inverse-document-frequency weighting
+    mean_ranks_uniform_with : np.ndarray | None
+        Reference mean vector for rank-based scalar alignment
+    cache_transform : bool
+        Whether to cache the transformed matrix (currently not fully implemented)
+    scalar : float
+        Multiplicative scalar applied to the transformed matrix
+    cached_mask : np.ndarray | None
+        Boolean mask of selected features
+    """
 
     def _repr_markdown_(self) -> str:
         return str(self)
@@ -201,7 +238,30 @@ def get_layer_feature_means(
         *,
         raw_X: Any | None = None,
         return_nans: bool = True
-):  
+):
+    """
+    Compute the per-feature mean across all observations.
+
+    Either provide ``raw_X`` directly, or provide both ``adata`` and ``layer``
+    to transform the data first.
+
+    Parameters
+    ----------
+    adata
+        Annotated data matrix (required if ``raw_X`` is not given)
+    layer
+        Layer configuration (required if ``raw_X`` is not given)
+    raw_X
+        Pre-transformed sparse matrix; mutually exclusive with ``adata``/``layer``
+    return_nans
+        If True, include features with NaN means in the result;
+        if False, filter them out
+
+    Returns
+    -------
+    np.ndarray
+        Array of per-feature means
+    """
     assert (raw_X is None) or (adata is None and layer is None), "provide raw_X or adata+layer, not both"
     if raw_X is not None:
         _X = raw_X
@@ -358,7 +418,26 @@ def make_layer_config(
     )
 
 def get_rank_scalars(mean0, mean1, eps=1e-2, scalar_minmax=(0.5, 2)):
-    """Get scalars for mean1 to match mean0"""
+    """
+    Compute per-feature scaling factors so that the rank-ordered means of ``mean1``
+    align with those of ``mean0``.
+
+    Parameters
+    ----------
+    mean0 : np.ndarray
+        Reference mean vector to align to
+    mean1 : np.ndarray
+        Mean vector to scale
+    eps : float
+        Minimum value to prevent division by zero; values below this are clamped
+    scalar_minmax : tuple[float, float]
+        Minimum and maximum values for clipping the resulting scalars
+
+    Returns
+    -------
+    np.ndarray
+        Per-feature scaling factors (clipped to ``scalar_minmax``)
+    """
     mean0 = mean0.copy()
     mean1 = mean1.copy()
     assert mean0.shape[0] == mean1.shape[0]
@@ -381,18 +460,24 @@ def copy_to_obs(
         binarize: bool = False
 ) -> None:
     """
-    Add data from layer or .obsm to obs for plotting
+    Add data from layer or .obsm to obs for plotting.
+
+    Transforms the data according to the layer configuration, optionally
+    binarizes it, then writes the per-observation sum into ``adata.obs['copied_data']``.
 
     Parameters
     ----------
     adata
+        Annotated data matrix
     layer_config
+        Layer configuration specifying which data to transform and how
     binarize
         Use threshold set in LayerConfig to make counts binary (passing or not passing)
-        
+
     Returns
     -------
-    `.obs['copied_data']`
+    None
+        Writes the result into ``adata.obs['copied_data']``
     """
 
     X = layer_config.transform(adata, use_cached_mask=True)
@@ -411,14 +496,27 @@ def normalize_layers(
         random_seed: int | None = None
 ):
     """
-    Write layer scalars into LayerConfigs
+    Write layer scalars into LayerConfigs.
+
+    Samples ``sample_k`` observations from each AnnData, computes the Frobenius
+    norm of the residual (X X^T - I) for each layer, and sets each layer's
+    ``scalar`` attribute so that layers are proportionally balanced.
 
     Parameters
     ----------
     adatas
+        List of AnnData objects, one per layer
     layer_configs
+        List of :class:`LayerConfig` objects corresponding to each AnnData
     sample_k
+        Number of observations to sample for norm estimation
     random_seed
+        Random seed for sampling observations
+
+    Returns
+    -------
+    None
+        Modifies ``layer_configs[i].scalar`` in place
     """
     gen = np.random.default_rng(seed=random_seed)
 

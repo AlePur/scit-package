@@ -92,7 +92,23 @@ def _membership_summary_on_array(
         anti_summary: bool = False
 ) -> dict:
     """
-    Summarize data 
+    Summarize a numpy array by categorical membership groups.
+
+    Parameters
+    ----------
+    adata
+        AnnData object with categorical membership in `.obs`
+    obs_key
+        Key in `.obs` for categorical membership groups
+    arr
+        Numpy array to summarize, must have same length as `adata.shape[0]`
+    anti_summary
+        If True, compute the anti-summary (complement) for each group
+
+    Returns
+    -------
+    dict
+        Dictionary mapping category names to sub-arrays of `arr`
     """
 
     d = {}

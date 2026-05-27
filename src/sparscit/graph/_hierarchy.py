@@ -10,10 +10,23 @@ from numpy.typing import NDArray
 
 def _vertexcluster(graph: Graph, membership: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
+    Compute vertex clustering from a graph and membership array.
+
+    Parameters
+    ----------
+    graph
+        Graph object to cluster
+    membership
+        Array of cluster memberships for each vertex
+
     Returns
     -------
-    (sizes, edges, weights)
-
+    sizes
+        Array of cluster sizes
+    edges
+        Array of edges between clusters
+    weights
+        Array of edge weights between clusters
     """
     _graph = graph.to_igraph().as_undirected()
     _graph.es["weight"] = 1
@@ -26,13 +39,42 @@ def _vertexcluster(graph: Graph, membership: np.ndarray) -> tuple[np.ndarray, np
     return (_sizes, _edges, _weights)
 
 def symmetric_skip(s: int, skip: list[int]) -> np.ndarray:
+    """
+    Compute symmetric index pairs excluding specified indices.
+
+    Parameters
+    ----------
+    s
+        Size of the index range (0 to s-1)
+    skip
+        List of indices to exclude from the pairs
+
+    Returns
+    -------
+    :class:`numpy.ndarray`
+        Array of index pairs (i, j) where i < j, excluding any pair
+        containing an index in `skip`
+    """
     _is = symmetric_i(s)
     return _is[~(np.isin(_is[:, 0], skip) + np.isin(_is[:, 1], skip))]  # type:ignore
 
 
 class Link:
     """
-    Helper class for link tree
+    Helper class for link tree nodes used in hierarchical ordering.
+
+    Attributes
+    ----------
+    index : int
+        Index of the cluster/node
+    children : list[Link]
+        Child links in the tree
+    size : int
+        Number of elements in this cluster
+    x : int
+        X-coordinate assigned during ordering
+    visible : bool
+        Whether this link is a visible leaf in the tree
     """
     index: int
     children: list[Self]
@@ -69,7 +111,17 @@ class Link:
 
 class HierarchyTree:
     """
-    Implements all cluster calculations
+    Implements hierarchical clustering and optimal ordering of communities.
+
+    Builds a linkage tree from a graph and community memberships, then
+    computes an optimal leaf ordering that minimizes linear edge distance.
+
+    Attributes
+    ----------
+    linkage : numpy.ndarray
+        Linkage matrix for the hierarchy
+    graph : Graph
+        The underlying graph object
     """
     linkage: np.ndarray
     graph: Graph

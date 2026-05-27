@@ -71,6 +71,21 @@ def dynamics_add_expression_data(
         feature_names: np.ndarray | None = None,
         activity_matrix: np.ndarray | None = None,
 ) -> None:
+    """Annotate a dynamics DataFrame with expression values from an activity matrix.
+
+    Parameters
+    ----------
+    dyn_df
+        Dynamics DataFrame with ``group`` and ``var_name`` columns
+    feature_names
+        Array of feature names matching the rows of ``activity_matrix``
+    activity_matrix
+        Dense matrix of shape (n_features, n_groups) with expression values
+
+    Returns
+    -------
+    Annotated Polars DataFrame with an added ``exp`` column
+    """
     ix = np.argsort(pl.DataFrame)
 
     def geti(n):
@@ -140,7 +155,33 @@ def griddata_correlations(
         signal_weighting: bool = False,
         return_raw: bool = False
 ) -> pl.DataFrame:
-    
+    """Compute per-feature correlations between two gridded landscapes.
+
+    For each pair of AnnData objects, extracts the grid data identified by
+    ``griddata_keys``, aligns on the shared feature set, and computes
+    correlations across grid positions.
+
+    Parameters
+    ----------
+    adatas
+        List of two AnnData objects, each with grid data in ``.uns['griddata']``
+    griddata_keys
+        Keys into ``.uns['griddata']`` for each AnnData
+    features
+        Subset of features to correlate
+    ignore_zeros
+        Zero out pairs where either value is zero before correlating
+    spearman
+        Use Spearman correlation instead of Pearson
+    signal_weighting
+        Weight correlations by signal magnitude
+    return_raw
+        Return raw covariance/std components (requires ``signal_weighting``)
+
+    Returns
+    -------
+    Polars DataFrame with correlation results and feature names
+    """
     if return_raw:
         assert signal_weighting, "Signal weighting needs to be true for return_raw"
     
@@ -168,6 +209,28 @@ def landscape_dynamics(
         fdc: bool = True,
         spearman: bool = True
 ) -> pl.DataFrame:
+    """Compute per-feature dynamics correlations on a landscape grid.
+
+    For each category in the categorical grid data, correlates the
+    numerical grid values with the grid's time axis.
+
+    Parameters
+    ----------
+    adata
+        AnnData with grid data stored in ``.uns['griddata']``
+    griddata_key
+        Key for the numerical grid data
+    categorical_gd_key
+        Key for the categorical grid data defining regions
+    fdc
+        Whether to apply FDR correction (currently unused)
+    spearman
+        Use Spearman correlation
+
+    Returns
+    -------
+    Polars DataFrame with columns ``group``, ``res``, and ``var_name``
+    """
 
     gd: Griddata = adata.uns['griddata'][griddata_key]
     gdc: Griddata = adata.uns['griddata'][categorical_gd_key]

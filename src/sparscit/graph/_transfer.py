@@ -15,7 +15,25 @@ _wtargets = Literal['obs', 'obsm', 'layers', 'uns']
 
 class KnnPredict:
     """
+    k-Nearest Neighbor predictor that can transfer data between AnnData objects.
 
+    Stores a trained sklearn KNeighborsClassifier or KNeighborsRegressor
+    and uses it to predict values for new data based on a shared embedding.
+
+    Attributes
+    ----------
+    embedding_key : str
+        Key in `.obsm` for the embedding used for prediction
+    regression : bool
+        Whether the predictor uses regression (True) or classification (False)
+    categories : numpy.ndarray or None
+        Category labels if classification, None otherwise
+    categorical : bool
+        Whether the target is categorical
+    trained_on : int
+        Number of cells the predictor was trained on
+    cat_dict : numpy.ndarray or None
+        Category dictionary for classification
     """
     def _repr_markdown_(self) -> str:
         return str(self)
@@ -54,6 +72,21 @@ class KnnPredict:
         return self
 
     def predict(self, *, query_manifold: np.ndarray | None = None, query_adata: AnnData | None = None) -> np.ndarray:
+        """
+        Predict values for new data using the trained kNN model.
+
+        Parameters
+        ----------
+        query_manifold
+            Pre-computed embedding for the query data. If None, uses ``query_adata.obsm[self.embedding_key]``
+        query_adata
+            Target AnnData object (used only if ``query_manifold`` is None)
+
+        Returns
+        -------
+        np.ndarray
+            Predicted values (class labels for classification, continuous values for regression)
+        """
         logging.info(f'Predicting new data for AnnData based on .obsm[{self.embedding_key}]')
         ArgAssert(self.embedding_key in query_adata.obsm.keys(), f'{self.embedding_key} not found in adata.obsm')
         if query_manifold is None:
@@ -122,9 +155,11 @@ def train_on_obs(
         Number of neighbors to use in training. More leads to more 'smeared' predicted data
     weights
         Weight based on 'distance' or 'uniform'
+
     Returns
     -------
-    `target_adata.obs['trans_<obs_key>']`
+    :class:`KnnPredict`
+        Trained kNN predictor object
     """
     ArgAssert(embedding_key in adata.obsm.keys(), "embedding_key not in adata.obsm")
     ArgAssert(obs_key in adata.obs.keys(), "obs_key not in adata.obs")
@@ -196,10 +231,8 @@ def train_on_matrix(
 
     Returns
     -------
-    `target_adata.layers['trans_<layer>']`
-        If transfering layer
-    `target_adata.obsm['trans_<obsm_key>']`
-        If transfering embedding
+    :class:`KnnPredict`
+        Trained kNN predictor object that can transfer layer or obsm data
     """
     ArgAssert(embedding_key in adata.obsm.keys(), "embedding_key not in adata.obsm")
     ArgAssert((obsm_key is None) or (layer is None), 'Either layer or obsm_key has to be None')

@@ -15,6 +15,24 @@ def _draw_distance(
         line_width: float,
         text_size: float
 ) -> None:
+    """
+    Draw an arrow with a distance label between two points on an axes.
+
+    Parameters
+    ----------
+    ax
+        Matplotlib axes to draw on
+    xy1
+        Start point coordinates
+    xy2
+        End point coordinates
+    dist
+        Distance value to display as label
+    line_width
+        Width of the arrow line
+    text_size
+        Font size of the distance label
+    """
     ax.annotate(
         "",
         xy=xy1,

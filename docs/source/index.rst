@@ -59,7 +59,7 @@ Module Overview
 +------------------------+----------+---------------------------------------------------+
 | Submodule              | Alias    | Purpose                                           |
 +========================+==========+===================================================+
-| ``sparscit.load``      | ``sc.ld``| Data loading (fragments, references, GO terms)   |
+| ``sparscit.load``      | ``sc.ld``| Data loading (fragments, references, GO terms)    |
 +------------------------+----------+---------------------------------------------------+
 | ``sparscit.tools``     | ``sc.tl``| Core analysis tools (filtering, statistics, etc.) |
 +------------------------+----------+---------------------------------------------------+
@@ -69,7 +69,7 @@ Module Overview
 +------------------------+----------+---------------------------------------------------+
 | ``sparscit.plotting``  | ``sc.pl``| Visualization (embeddings, heatmaps, statistics)  |
 +------------------------+----------+---------------------------------------------------+
-| ``sparscit.advanced``  | ``sc.adv``| Advanced analysis (landscapes, HMMs, dynamics) |
+| ``sparscit.advanced``  |``sc.adv``| Advanced analysis (landscapes, HMMs, dynamics)    |
 +------------------------+----------+---------------------------------------------------+
 
 Data Model
@@ -89,5 +89,4 @@ SparSCit operates on ``anndata.AnnData`` objects. Data is stored in:
    :maxdepth: 2
    :caption: Contents:
 
-   tutorial
    modules

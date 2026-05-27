@@ -75,6 +75,37 @@ def fragments_to_bulks(
         # parquet_temp: str | None = None,
         chr_name_format: _chr_format = 'auto'
 ) -> None:
+    """Export per-category bulk fragment files from a fragments file.
+
+    Reads a fragments file (potentially gzipped) and writes one TSV per
+    category in ``obs_key``, containing the aggregated fragments for all
+    cells belonging to that category.
+
+    Parameters
+    ----------
+    adata
+        AnnData with cell metadata in ``.obs``
+    obs_key
+        Column in ``adata.obs`` defining group memberships
+    src
+        Path to the fragments TSV file
+    out_dir
+        Output directory for bulk TSV files
+    whitelisted_chr
+        List of chromosome names to include
+    overwrite_output
+        If ``True``, overwrite existing output directory
+    override_names
+        Optional list of cell names to use instead of ``adata.obs_names``
+    polars_csv_kwargs
+        Extra keyword arguments passed to the Polars CSV reader
+    gc_collect
+        Run garbage collection between batches
+    batch_size
+        Number of rows per batch when reading the fragments file
+    chr_name_format
+        Chromosome name format: ``'auto'``, ``'ucsc'``, or ``'ensembl'``
+    """
     if src[:-3] == '.gz':
         logging.info('You are loading a .gzipped file. Some streaming operations might be impossible, leading to very high memory usage')
     logging.info(f"Writing to {out_dir}(/)<categorical>.tsv")

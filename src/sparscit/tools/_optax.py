@@ -44,7 +44,25 @@ def log_loss_sklearn(
 
 @partial(jit, static_argnames=['normalize'])
 def _log_loss(params: LogisticParams, X: jnp.ndarray, y: jnp.ndarray, normalize: bool = True):
-    """Compute binary cross-entropy loss."""
+    """
+    Compute binary cross-entropy loss for logistic regression.
+
+    Parameters
+    ----------
+    params : LogisticParams
+        Named tuple of (coef, intercept)
+    X : jnp.ndarray
+        Feature matrix of shape (n_samples, n_features)
+    y : jnp.ndarray
+        Binary target labels of shape (n_samples,)
+    normalize : bool
+        If True, return mean loss per sample; otherwise return sum
+
+    Returns
+    -------
+    float
+        Binary cross-entropy loss value
+    """
     w, b = params
     logits = jnp.dot(X, w) + b
     # Binary cross-entropy
@@ -66,14 +84,26 @@ def fit_log_regression(
         warm_params: LogisticParams = LogisticParams(coef = jnp.array([0]), intercept=jnp.array(0.0))
 ) -> LogisticParams:
     """
+    Fit a binary logistic regression model using L-BFGS via Optax.
+
     Parameters
     ----------
-    X : shape (n_samples, n_features)
-        Training data.
-    y : shape (n_samples,)
-        Target values (binary: 0 or 1).
+    X : jnp.ndarray, shape (n_samples, n_features)
+        Training data
+    y : jnp.ndarray, shape (n_samples,)
+        Target values (binary: 0 or 1)
+    max_iter
+        Maximum number of optimization iterations
+    tol
+        Convergence tolerance on gradient norm
+    warm_params : LogisticParams
+        Initial parameters. Must have the correct shape for X.
+        If unsure, set coef and intercept to zero arrays of appropriate shape.
 
-    Warm params must be provided. If you don't know what param to use, set it to zero. But it has to have the right shape for your X
+    Returns
+    -------
+    LogisticParams
+        Named tuple with fitted ``coef`` and ``intercept``
     """
     print('Debug: traced fit_log_regression')
     # Initialize parameters
@@ -126,14 +156,15 @@ def predict_proba(params: LogisticParams, X: jnp.ndarray) -> jnp.ndarray:
     
     Parameters
     ----------
-    coef
-    X : np.ndarray, shape (n_samples, n_features)
+    params : LogisticParams
+        Named tuple of (coef, intercept) with fitted logistic regression parameters
+    X : jnp.ndarray, shape (n_samples, n_features)
         Samples.
         
     Returns
     -------
-    proba : np.ndarray, shape (n_samples, 2)
-        Probability of each class.
+    proba : jnp.ndarray, shape (n_samples, 2)
+        Probability of each class (class 0, class 1).
     """
     X = jnp.array(X, dtype=jnp.float32)
     logits = jnp.dot(X, params.coef.T).squeeze() + params.intercept
@@ -153,7 +184,7 @@ def likelihood_ratio_test(
 ) -> jnp.ndarray:
     """
     Adopted from SnapATAC2, added JAX implementations.
-    Comparing null model with alternative model using the likehood ratio test.
+    Comparing null model with alternative model using the likelihood ratio test.
     reduced_params needs to be correct for the X and y, otherwise the result will not be sensible.
 
     Parameters
@@ -165,10 +196,15 @@ def likelihood_ratio_test(
         Note: X1 does NOT contain X0, it's added to it when this function runs.
     y
         (n_sample, ), labels.
+    reduced_params : LogisticParams
+        Pre-fitted parameters for the reduced (null) model on X0.
+    ddof : int
+        Degrees of freedom for the chi-squared test (default 1).
 
     Returns
     -------
-    The P-value.
+    jnp.ndarray
+        The P-value from the likelihood ratio test.
     """
     print('Debug: traced likelihood_ratio_test')
     # s: LogisticParams = fit_log_regression(X0, y, warm_params=warm_params)

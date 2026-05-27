@@ -52,6 +52,27 @@ def binary_active_feature(
         *,
         alignment_type: _alignment | None = None
 ) -> None:
+    """Return a boolean mask of features that are active in at least one cell.
+
+    A feature is considered active if the binarized layer sum across cells
+    exceeds ``threshold``.
+
+    Parameters
+    ----------
+    adata
+        AnnData object
+    layer
+        LayerConfig specifying which layer to transform
+    threshold
+        Minimum number of active cells for a feature to be considered active
+    alignment_type
+        If set, restrict the mask to features aligned under the given type
+        (``'bin'`` or ``'gene'``)
+
+    Returns
+    -------
+    Boolean array indicating which features are active
+    """
     _all = (layer.transform(adata, binarize=True, return_view_only=True).sum(axis=0).A1 > threshold)
     if alignment_type is not None:
         _all = _all[adata.uns['aligned_features'][f'{alignment_type}_indices']]
@@ -68,6 +89,25 @@ def multi_color_copy(
             11: '#c3b812'
         }
 ) -> np.ndarray:
+    """Combine multiple binary layers into a single categorical observation.
+
+    Each layer contributes a digit in a base-10 encoding; the resulting
+    categories are stored in ``adata.obs['copied_data']`` and the colour
+    mapping in ``adata.uns['colors_dict']``.
+
+    Parameters
+    ----------
+    adata
+        AnnData object to annotate
+    layers
+        List of LayerConfigs to combine
+    colors
+        Mapping from encoded category value to colour string
+
+    Returns
+    -------
+    Boolean mask of cells with non-zero combined activity
+    """
     scalar = 10 ** np.arange(len(layers))
     datas = np.array([l.transform(adata, use_cached_mask=True, binarize=True).todense().A1 for l in layers])
     adata.obs['copied_data'] = pd.Categorical(scalar @ datas.astype(np.uint32))
@@ -85,6 +125,20 @@ def feature_to_bed(
         features: np.ndarray,
         mask: np.ndarray
 ):
+    """Write selected features to a BED file.
+
+    Features are expected in ``chr:start-end`` format and are split on
+    ``:`` and ``-`` to produce the three required BED columns.
+
+    Parameters
+    ----------
+    path
+        Output BED file path
+    features
+        Array of feature strings in ``chr:start-end`` format
+    mask
+        Boolean mask selecting which features to write
+    """
     feats = features[mask]
     feats = np.array([
         [f.split(':')[0], *f.split(':')[1].split('-')] for f in feats
@@ -100,5 +154,20 @@ def dense_binary_activity_matrix(
         layer: LayerConfig,
         mask: np.ndarray
 ) -> np.ndarray:
+    """Extract a dense boolean matrix of activity for selected features.
+
+    Parameters
+    ----------
+    adata
+        AnnData object
+    layer
+        LayerConfig specifying which layer to transform
+    mask
+        Boolean feature mask selecting which columns to keep
+
+    Returns
+    -------
+    Dense boolean array of shape (n_cells, n_selected_features)
+    """
     l = layer.transform(adata, binarize=True, return_view_only=True)
     return np.array(l[:, mask].todense()).astype(np.bool_)

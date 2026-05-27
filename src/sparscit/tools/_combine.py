@@ -8,6 +8,22 @@ from .._utils import ArgAssert
 from .._logging import logging
 
 def set_missing_to_zero(adata, feature_list):
+    """
+    Add missing features as zero-filled layers to an AnnData object.
+
+    Parameters
+    ----------
+    adata
+        AnnData object to extend
+    feature_list
+        List of feature names. Features not already in `adata.var_names`
+        will be added as zero-filled columns.
+
+    Returns
+    -------
+    :class:`AnnData`
+        Concatenated AnnData with missing features filled as zeros
+    """
     missing=feature_list[~np.isin(feature_list, adata.var_names)]
     print(f"{len(missing)} features missing.")
 

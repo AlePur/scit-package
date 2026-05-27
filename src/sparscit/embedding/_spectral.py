@@ -15,6 +15,25 @@ def _internal_spectral(
         n_components: int,
         sd_weighted: bool
 ) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Compute spectral embedding from a normalized count matrix.
+
+    Parameters
+    ----------
+    X
+        Sparse count matrix (cells x features), already normalized
+    n_components
+        Number of spectral components to compute
+    sd_weighted
+        Whether to weight eigenvectors by the square root of eigenvalues
+
+    Returns
+    -------
+    eigenvalues : numpy.ndarray
+        Computed eigenvalues
+    eigenvectors : numpy.ndarray
+        Computed eigenvectors (columns)
+    """
     if (np.sum(X, axis=1) == 0).any():
         raise ValueError(f"Some cells have a total of 0 counts. Please exclude them to avoid division by zero")
 

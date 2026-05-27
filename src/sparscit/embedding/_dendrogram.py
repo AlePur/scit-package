@@ -9,16 +9,25 @@ def dendrogram(
         random_seed: int = 0
 ) -> None:
     """
-    Create embedding based on dendrogram order
+    Create embedding based on dendrogram order.
+
+    Writes a 2D embedding into ``adata.obsm['X_dendrogram']`` where the x-coordinate
+    is derived from community tree ordering and the y-coordinate from the specified
+    observation key.
 
     Parameters
     ----------
+    adata
+        Annotated data matrix with community tree information in ``adata.uns``
     y_key
         Key in .obs to use for y-coordinate of cell on embedding
+    random_seed
+        Random seed for jitter applied to x-coordinates
 
     Returns
     -------
-    `adata.obsm['X_dendrogram']`
+    None
+        Writes the result into ``adata.obsm['X_dendrogram']``
     """
     _verify_lsc(adata, y_key)
     ykey = adata.obs[y_key].to_numpy()

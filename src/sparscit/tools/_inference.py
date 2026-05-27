@@ -11,6 +11,20 @@ from .._logging import logging
 def matrix_from_memberships(
         memberships: dict[str, int]
 ):
+    """
+    Create a sparse binary membership matrix from a membership dictionary.
+
+    Parameters
+    ----------
+    memberships
+        Dictionary mapping feature names to membership group indices
+
+    Returns
+    -------
+    :class:`scipy.sparse.csr_matrix`
+        Binary matrix of shape (n_groups, n_features) where entry (i, j) is 1
+        if feature j belongs to group i
+    """
     features = list(memberships.keys())
     membership_ids = list(memberships.values())
     
@@ -41,6 +55,29 @@ def go_infer_layer(
         return_matrix: bool = False
 ) -> None:
     """
+    Infer a layer from GO term associations and gene-bin regulation.
+
+    Parameters
+    ----------
+    adata
+        AnnData object
+    gene_population
+        Array of gene identifiers present in the data
+    obodag
+        :class:`GODagWrap` object with the GO DAG
+    ns2assoc
+        Dictionary mapping namespaces to gene-GO associations
+    include_gos
+        List of GO term names to include as roots
+    lc
+        :class:`LayerConfig` for the data layer
+    return_matrix
+        If True, return the matrix instead of calling :func:`infer_layer`
+
+    Returns
+    -------
+    GO_X : scipy.sparse.csr_matrix
+        Only if `return_matrix=True`, the gene-GO association matrix
     """
     namespaces = ['MF', 'CC', 'BP']
     # Make go-term inferred layer

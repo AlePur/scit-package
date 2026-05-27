@@ -12,6 +12,31 @@ def rep_correlation(
         *,
         use_cached_mask = False
 ):
+    """
+    Compute Spearman correlation between groups defined by an obs column.
+
+    For each group in ``adata.obs[obs_key]``, computes the mean expression
+    profile across features, then calculates the pairwise Spearman correlation
+    matrix between groups.
+
+    Parameters
+    ----------
+    adata
+        Annotated data matrix
+    layer
+        Layer configuration specifying which data layer to use
+    obs_key
+        Key in ``adata.obs`` defining group memberships
+    use_cached_mask
+        Whether to use a previously cached feature mask
+
+    Returns
+    -------
+    corrs : np.ndarray
+        Spearman correlation matrix of shape (n_groups, n_groups)
+    labels : list[str]
+        Group labels corresponding to rows/columns of the correlation matrix
+    """
 
     X = layer.transform(adata, use_cached_mask=use_cached_mask)
     cats, cat_names, uq_cats = _get_memberships(adata, obs_key)

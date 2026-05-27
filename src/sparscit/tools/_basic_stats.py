@@ -14,6 +14,39 @@ def vectorized_chi2(
         vector_on: Literal['values', 'groups'] = 'values',
         statistic: Literal['ratio', 'original'] = 'ratio'
 ) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Compute chi-squared test scores and p-values for each feature comparing a group against the rest.
+
+    For each feature, constructs a 2×2 contingency table of (group_sum, group_n - group_sum)
+    vs (rest_sum, rest_n - rest_sum) and computes the chi-squared statistic and p-value.
+
+    Parameters
+    ----------
+    group_sum
+        Array of summed values within the group for each feature
+    group_n
+        Number of observations in the group (scalar if ``vector_on='values'``,
+        array if ``vector_on='groups'``)
+    rest_sum
+        Array of summed values in the rest for each feature
+    rest_n
+        Number of observations in the rest (scalar or array, same as ``group_n``)
+    rank_based_fc
+        If True, use rank-based fold change instead of ratio
+    vector_on
+        ``'values'`` means group_n/rest_n are scalar (constant group size across features);
+        ``'groups'`` means they are arrays (varying group sizes)
+    statistic
+        ``'ratio'`` returns log2 fold-change as score; ``'original'`` returns the raw
+        chi-squared statistic
+
+    Returns
+    -------
+    scores : np.ndarray
+        Feature scores (log2 fold-change or chi-squared statistic depending on ``statistic``)
+    pvals : np.ndarray
+        Chi-squared p-values for each feature
+    """
     scores = np.ones(group_sum.shape, dtype=np.float64)
     pvals = scores.copy()
 

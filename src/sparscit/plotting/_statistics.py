@@ -23,7 +23,33 @@ def volcano_plot(
         show: bool = True,
         s: int = 1
 ):
-    
+    """Create a volcano plot from p-values and log-fold changes.
+
+    Parameters
+    ----------
+    pval
+        Adjusted p-values for each feature
+    lfc
+        Log2 fold-change values for each feature
+    min_pval
+        Significance threshold for p-values
+    min_lfc
+        Minimum absolute log2 fold-change for significance
+    yminmax
+        Y-axis limits for the plot
+    xminmax
+        X-axis limits for the plot
+    zero_to_min
+        Replace zero p-values with the minimum non-zero p-value
+    show
+        Whether to show the plot immediately
+    s
+        Marker size for the scatter plot
+
+    Returns
+    -------
+    Matplotlib Figure if ``show`` is ``False``, otherwise ``None``
+    """
     _pval = pval.copy()
     if zero_to_min:
         _pval[_pval == 0] = np.nan

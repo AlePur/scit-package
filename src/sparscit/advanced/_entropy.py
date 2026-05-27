@@ -11,7 +11,26 @@ def shannon_entropy(
         class_obs_key: str,
         celltype_obs_key: str
 ) -> pl.DataFrame:
-     
+    """Compute Shannon entropy of feature activity across cell types within each class.
+
+    For each class in ``class_obs_key``, calculates the entropy of the
+    per-cell-type mean activity distribution for every feature.
+
+    Parameters
+    ----------
+    adata
+        AnnData object with categorical annotations in ``.obs``
+    lc
+        LayerConfig specifying which layer to transform
+    class_obs_key
+        Key in ``adata.obs`` for the class grouping
+    celltype_obs_key
+        Key in ``adata.obs`` for the cell-type grouping
+
+    Returns
+    -------
+    Polars DataFrame with entropy and prevalence columns per class and feature
+    """
     X = lc.transform(adata, use_cached_mask=True) # active
     class_cats, class_cat_names, class_uq_cats = _get_memberships(adata, class_obs_key)
     ct_cats, ct_cat_names, ct_uq_cats = _get_memberships(adata, celltype_obs_key)

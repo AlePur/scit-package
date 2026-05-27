@@ -252,6 +252,46 @@ def griddata_apply_transformations(
         winsor_set_low_zero: bool = False,
         nan_fill: float = 0.0
 ) -> None:
+    """Apply a pipeline of transformations to numerical grid data in-place.
+
+    Supports upscaling, Gaussian smoothing, median filtering, quantile
+    normalisation, and Winsorisation.  The grid data stored in
+    ``adata.uns['griddata'][griddata_key]`` is modified in place.
+
+    Parameters
+    ----------
+    adata
+        AnnData with grid data in ``.uns['griddata']``
+    griddata_key
+        Key identifying which grid data to transform
+    gauss_kernel
+        Sigma values for Gaussian kernel; ``None`` skips Gaussian smoothing
+    median_filter_size
+        Size of the median filter kernel; ``None`` skips median filtering
+    n_median_passes
+        Number of times to apply the median filter
+    upscale_factor
+        Integer factor by which to upscale the grid resolution
+    data_scalar
+        Scalar multiplier applied to the data before transformations
+    max_up
+        Maximum allowed upscale factor (safety guard)
+    all_feature_q_norm
+        If set, normalise each grid position across all features at this
+        quantile
+    data_range_q
+        Quantile used for range normalisation (1.0 = max)
+    winsor_qs_low
+        Lower quantile for Winsorisation; ``None`` to skip
+    winsor_qs_high
+        Upper quantile for Winsorisation; ``None`` to skip
+    winsor_q_is_p_max
+        Treat the upper Winsor quantile as a fraction of the max value
+    winsor_set_low_zero
+        Set Winsorised low values to zero instead of clipping
+    nan_fill
+        Value used to fill NaN entries
+    """
     gd: Griddata = adata.uns['griddata'][griddata_key]
 
     ArgAssert(not gd['categorical'], "Categorical griddata is not supported")

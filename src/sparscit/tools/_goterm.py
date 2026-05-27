@@ -8,6 +8,8 @@ from ._statistics import Markers
 from ._reference import Reference, symbol2id
 
 class GODagWrap:
+    """Wrapper around a GO DAG (Gene Ontology Directed Acyclic Graph) object."""
+
     def _repr_markdown_(self) -> str:
         return str(self)
 
@@ -19,6 +21,7 @@ class GODagWrap:
         self.namespaces = namespaces
 
 class GOEA:
+    """Gene Ontology Enrichment Analysis result wrapper."""
 
     def _repr_markdown_(self) -> str:
         return str(self)

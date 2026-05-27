@@ -12,6 +12,29 @@ def barplot(
         h: bool = False,
         show: bool = True
 ) -> None:
+    """Create a bar plot from values and labels.
+
+    Parameters
+    ----------
+    values
+        Heights (or widths for horizontal bars) of the bars
+    names
+        Category labels for each bar
+    color
+        Bar colour
+    title
+        Optional plot title
+    xlabel
+        Label for the value axis; defaults to ``'-ln(p_corr)'``
+    h
+        If ``True``, draw horizontal bars
+    show
+        Whether to display the plot immediately
+
+    Returns
+    -------
+    Matplotlib Figure if ``show`` is ``False``, otherwise ``None``
+    """
     plw = MplWrap(show)
 
     if h:

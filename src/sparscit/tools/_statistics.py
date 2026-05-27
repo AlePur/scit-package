@@ -27,6 +27,7 @@ _test_type = Literal['ttest', 'chisquare', 'mannwhitneyu', 'wilcoxon', 'likeliho
 
 
 class StatisticResult:
+    """Container for statistical test results across features."""
     def __init__(self, data_len: int, test_scheme: list, res: np.ndarray, score: np.ndarray | None = None):
         self.data_len = data_len
         self.test_scheme = test_scheme
@@ -35,6 +36,7 @@ class StatisticResult:
 
 
 class Markers:
+    """Container for marker gene results, including top markers and enrichment statistics."""
     def _repr_markdown_(self) -> str:
         return str(self)
 
@@ -63,6 +65,39 @@ def likelihood_test_on_adata(
         min_lfc: float = 0.25,
         min_base_mean: float | None = None
 ) -> pl.DataFrame:
+    """Run a likelihood-ratio test comparing two AnnData objects on a categorical observation.
+
+    Computes per-feature likelihood-ratio test statistics between groups defined by
+    ``obs_key``, comparing ``adata`` (group 0) against ``cmpdata`` (group 1), with
+    optional covariate adjustment and log-transformation.
+
+    Parameters
+    ----------
+    adata
+        First AnnData (reference group)
+    cmpdata
+        Second AnnData (comparison group)
+    obs_key
+        Key in ``.obs`` defining group memberships
+    lc
+        LayerConfig specifying which layer and features to use
+    log_transform_for_regression
+        Apply log1p transform to data before regression
+    log_transform_covariate
+        Apply log transform to the covariate (total counts)
+    test_anti_categorical
+        If ``True``, compute anti-summary for the comparison group
+    mean_ranks_normalize
+        Normalize mean ranks using the first AnnData's feature means
+    min_lfc
+        Minimum log2 fold-change threshold for filtering
+    min_base_mean
+        Minimum base mean threshold for filtering
+
+    Returns
+    -------
+    Polars DataFrame with columns ``pval``, ``score``, ``name``, ``base_mean``, and ``group``
+    """
     logging.info(f"Running likelihood test with minimum LFC={min_lfc}; min_base_mean={min_base_mean}")
     Xs: list[dict[str, Any]] = []
     Xs_with_log: list[dict[str, Any]] = []
@@ -144,6 +179,33 @@ def likelihood_test(
         min_lfc: float | None = None,
         min_base_mean: float | None = None
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Perform a likelihood-ratio test on sparse count data.
+
+    Compares two groups defined by ``mask`` using a covariate-adjusted
+    likelihood-ratio test, with optional FDR correction and fold-change
+    filtering.
+
+    Parameters
+    ----------
+    data
+        Sparse count matrix (cells × features)
+    mask
+        Boolean array indicating group membership (True = group 1)
+    data_for_regression
+        Optional alternative data matrix used for regression (e.g. log-transformed)
+    covariate
+        Covariate vector (e.g. total counts) for adjustment
+    fdr
+        Apply Benjamini-Hochberg FDR correction to p-values
+    min_lfc
+        Minimum absolute log2 fold-change to include in test
+    min_base_mean
+        Minimum base mean to include in test
+
+    Returns
+    -------
+    Tuple of (adjusted p-values, log2 fold-change scores, base means)
+    """
     uq = set(list(np.unique(mask)))
     assert uq == set([True, False]) or uq == set([0, 1]), 'Mask must only contain 0,1 or True,False'
     mask = mask.astype(np.bool_)

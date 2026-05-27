@@ -48,6 +48,25 @@ def predict_observations(
         *,
         predict_var: bool = False,
 ):
+    """Reconstruct observations from HMM state probabilities.
+
+    Uses the stored probabilities to compute expected (or variance) values
+    per observation and stores the result in the data's supplementary
+    storage.
+
+    Parameters
+    ----------
+    hmm
+        Fitted HMM model (single or list wrapper)
+    data
+        HMMData object with probabilities already computed
+    y_pred_name
+        Key for the probability array in ``data.supp``
+    data_name
+        Key under which to store the reconstructed data
+    predict_var
+        If ``True``, predict variance instead of expected value
+    """
     _y_proba = data.supp[hmm.name].probabilities[y_pred_name]
     if isinstance(hmm, HMMListWrapper):
         expecteds = np.zeros((_y_proba.shape[0], _y_proba.shape[1], _y_proba.shape[2], len(hmm.scheme)), dtype=np.float32)
@@ -70,6 +89,24 @@ def get_probabilities(
         scheme: list[int],
         data_name: str
 ):
+    """Compute state probabilities for each observation using a fitted HMM.
+
+    Runs the HMM forward algorithm on the specified data layers and stores
+    the resulting probability arrays in the data's supplementary storage.
+
+    Parameters
+    ----------
+    hmm
+        Fitted HMM model (single or list wrapper)
+    data
+        HMMData object containing the observation data
+    data_layers
+        List of layer names to use as input
+    scheme
+        Cell-type scheme mapping for list wrappers
+    data_name
+        Key under which to store the computed probabilities
+    """
     warnings.filterwarnings("ignore")
     _X = data.get_data(data_layers)
 

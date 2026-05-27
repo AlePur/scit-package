@@ -11,18 +11,25 @@ def add_metadata(
         var_loc_metadata: bool = True
 ) -> None:
     """
-    Add total counts metadata and bin location metadata. All metadata are optional. The metadata to be added can be controlled by boolean parameters
+    Add total counts metadata and bin location metadata to an AnnData object.
+
+    For each layer key in ``counts_to_add``, writes per-observation and per-variable
+    total counts into ``adata.obs`` and ``adata.var``. If ``var_loc_metadata`` is True,
+    parses ``adata.var.index`` (expected format ``chr:start-end``) into separate columns.
 
     Parameters
     ----------
     adata
-
+        Annotated data matrix
+    counts_to_add
+        List of layer/obsm keys whose total counts should be added as metadata
     var_loc_metadata
-        Whether to add bin location metadata
+        Whether to parse and add bin location metadata from ``adata.var.index``
 
     Returns
     -------
-
+    None
+        Modifies ``adata`` in place
     """
     def _add_c(k: str, view, skip_v: bool = False):
         adata.obs[f'{k}_total_counts']=(view.sum(axis=1).A1)

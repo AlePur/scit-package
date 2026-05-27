@@ -9,6 +9,14 @@ from .._utils import ArgAssert
 
 
 class Reference:
+    """
+    A feature reference table backed by a Polars DataFrame.
+
+    Attributes
+    ----------
+    df : polars.DataFrame
+        Reference table with feature annotations
+    """
 
     def _repr_markdown_(self) -> str:
         return str(self)
@@ -25,6 +33,19 @@ def symbol2id(
         ref: Reference,
         genes
 ) -> np.ndarray:
+    """Map gene symbols to their database IDs using a reference.
+
+    Parameters
+    ----------
+    ref
+        Reference object containing gene identifier mappings
+    genes
+        Array-like of gene symbols to map
+
+    Returns
+    -------
+    Array of mapped IDs; entries are ``None`` where no mapping was found
+    """
     n2i = dict(zip(ref.df['id'], ref.df['extra']))
     return np.array([n2i.get(p) for p in genes])
 
@@ -45,7 +66,8 @@ def get_gene_index(
 
     Returns
     -------
-
+    int
+        Index of the feature in the array, or -1 if not found (when ``error_on_not_found=False``)
     """
     am = (feature_names == feature).argmax()
     if am == 0:

@@ -150,6 +150,26 @@ def random_neighborhood_matrix(
         obsp_key: str = 'connectivities',
         random_seed: int = 0
 ) -> None:
+    """Generate random neighbourhood partitions and store as a matrix in ``adata.obsm``.
+
+    Repeatedly calls :func:`random_neighborhood` to produce ``sample_n``
+    random partitions and stacks them into a matrix stored under
+    ``adata.obsm['random_matrix']``.
+
+    Parameters
+    ----------
+    adata
+        AnnData with a connectivity graph in ``.obsp[obsp_key]``
+    n_clusters
+        Number of clusters per sample, or a list of cluster counts
+        (one per sample)
+    sample_n
+        Number of random partitions to generate
+    obsp_key
+        Key in ``adata.obsp`` for the connectivity matrix
+    random_seed
+        Starting random seed (incremented per sample)
+    """
     random_seed = int(random_seed)
     res = []
     getn = lambda x: n_clusters

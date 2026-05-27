@@ -183,16 +183,15 @@ def knn_impute(
     layers
         List of layer names to impute
     impute_strength
-        Influence of neighboring cell counts on each cell. This value reflects how many
-        times influence the imputed counts have compared to original counts. For example,
-        impute_strength = 2.0 implies imputed values account for 2/3 of final counts while
-        1/3 is the original cell counts
+        Weight of imputed values in the final result. The output is computed as
+        `impute_strength * imputed + (1 - impute_strength) * original`. Must be
+        less than 1.0
     density_normalize
         Whether to density-normalize the connectivity matrix before imputation
     obsp_key
         Key in `.obsp` for the connectivity matrix to use
     normalize_with_obs_counts
-        Whether to normalize layer before imputing
+        Whether to normalize each layer by total observation counts before imputing
 
     Returns
     -------

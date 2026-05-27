@@ -205,16 +205,22 @@ def normalize_time_per_cluster(
     """
     Normalize time per-cluster. Returns normalized time.
 
+    For each group, shifts time so the minimum is zero, then rescales
+    to the original global range.
+
     Parameters
     ----------
     adata
+        Annotated data matrix
     time_key
+        Key in ``adata.obs`` containing the time/pseudotime values
     group_key
+        Key in ``adata.obs`` defining cluster memberships (categorical)
 
     Returns
     -------
-    time
-        Updated time
+    np.ndarray
+        Normalized time values
     """
     cats, cat_names, uq_cats = _get_memberships(adata, group_key)
     times = adata.obs[time_key].to_numpy().copy()

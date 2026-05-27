@@ -26,6 +26,43 @@ def scatter(
         corr_use_minmax: bool = False,
         show: bool = True
 ) -> None | Figure:
+    """Create a scatter plot from one or more 2-D point arrays.
+
+    Parameters
+    ----------
+    datas
+        Single ``(N, 2)`` array or list of such arrays to plot
+    labels
+        Legend labels for each data array
+    alpha
+        Point transparency
+    title
+        Optional plot title
+    colors
+        Colour for each data array
+    c_map
+        Per-point colour maps (overrides ``colors`` when set)
+    xminmax
+        X-axis limits; ``None`` for auto
+    yminmax
+        Y-axis limits; ``None`` for auto
+    s
+        Marker size
+    xlabel
+        X-axis label
+    ylabel
+        Y-axis label
+    corr
+        If ``'spearman'`` or ``'pearson'``, print the correlation statistic
+    corr_use_minmax
+        Restrict correlation computation to points within the axis limits
+    show
+        Whether to display the plot immediately
+
+    Returns
+    -------
+    Matplotlib Figure if ``show`` is ``False``, otherwise ``None``
+    """
     plw = MplWrap(show)
     if not isinstance(datas, list):
         datas = [datas]

@@ -13,6 +13,21 @@ from .._logging import logging
 
 
 class Graph:
+    """
+    Lightweight graph representation using edge lists.
+
+    Stores edges as an array of (source, target) pairs with optional weights.
+    Can be converted to and from igraph objects and sparse distance matrices.
+
+    Attributes
+    ----------
+    edges : np.ndarray
+        Array of shape (n_edges, 2) with (source, target) pairs
+    weights : np.ndarray
+        Edge weights; empty array if unweighted
+    obsp_key : str
+        Key in ``adata.obsp`` where the original distance matrix is stored
+    """
     edges: np.ndarray
     _directed: bool
     weights: np.ndarray
@@ -65,18 +80,24 @@ class Graph:
 
     def cast_edges(self, directed: bool, self_edge: bool = True, copy: bool = False) -> Optional[np.ndarray]:
         """
-        Enforce constraints on edges, discarding those that do not meet conditions
+        Enforce constraints on edges, discarding those that do not meet conditions.
+
+        If the graph is directed and ``directed=False``, converts to undirected by
+        merging reciprocal edges. Optionally removes self-edges.
 
         Parameters
         ----------
-
+        directed
+            Whether the resulting edges should be directed
+        self_edge
+            Whether to keep self-edges (loops); if False, self-edges are removed
         copy
-            If `True`, return edges as an array instead of replacing in place
+            If True, return edges as an array instead of replacing in place
 
         Returns
         -------
-        `Array`
-            Only if `copy`
+        np.ndarray or None
+            Edge array only if ``copy`` is True; otherwise modifies in place and returns None
         """
         edges = np.array(self.edges)
         if self.is_directed() and (directed == False):
@@ -127,10 +148,24 @@ class Graph:
             weighted: bool
     ) -> 'Graph':
         """
-        Notes
-        -----
+        Create a Graph from a sparse distance matrix.
+
+        Parameters
+        ----------
+        matrix
+            Sparse distance matrix (CSR format) with non-zero entries as edges
+        obsp_key
+            Key in ``adata.obsp`` where the distance matrix is stored
         directed
-            It's up to the caller to be sure that the edges are not directed
+            Whether the graph should be directed. It is up to the caller to ensure
+            the edges are consistent with this flag
+        weighted
+            Whether to store the distance values as edge weights
+
+        Returns
+        -------
+        :class:`Graph`
+            New graph instance with edges derived from the distance matrix
         """
         sources, targets = matrix.nonzero()
         coo = matrix.tocoo()

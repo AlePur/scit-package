@@ -3,6 +3,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 import matplotlib.pyplot as plt
 
 class ImageToolsCV2:
+    """Utility class for image processing operations using OpenCV."""
     @staticmethod
     def crop_white(img, threshold=245, padding=10):
         """

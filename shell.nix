@@ -16,10 +16,6 @@ pkgs.mkShell {
       pkgs.glib
       pkgs.cairo
     ]}:${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH
-    cd $HOME/Skrivbord/pyproject/notebooks
-    source ../venv/bin/activate
-    export MYTOK="b6d8cb79d11d56f44849eab77a7e459837d165abf0c0767c"
-    echo "$MYTOK" | xclip -selection clipboard
-    jupyter notebook --no-browser --NotebookApp.token=$MYTOK
+    source ./venv/bin/activate
   '';
 }

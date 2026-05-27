@@ -14,11 +14,23 @@ def transpose_anndata(
         copy_var: bool = True
 ) -> AnnData:
     """
+    Transpose an AnnData object, creating a new AnnData where observations become variables.
+
     Parameters
     ----------
     adata
+        Annotated data matrix to transpose
     layers
-        layer to transpose in new data
+        Layer configurations specifying which layers to transpose into the new data
+    n_features
+        Number of features (rows) in the transposed matrix
+    copy_var
+        If True, copy ``adata.var`` into ``tdata.obs``
+
+    Returns
+    -------
+    AnnData
+        Transposed AnnData object
     """
     X = csr_matrix((n_features, adata.shape[0]))
     tdata = ad.AnnData(X)

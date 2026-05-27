@@ -78,6 +78,35 @@ def create_hmm_system(
         early_stop_tol: float = 1,
         pomegranate_densehmm_kwargs: dict = {}
 ) -> HMMListWrapper:
+    """Create a system of HMMs, one per cell-type scheme entry.
+
+    Each HMM in the system shares the same ``n_states`` and ``hmm_scheme``
+    but is trained on a different subset of cell types defined by
+    ``cell_type_scheme``.
+
+    Parameters
+    ----------
+    n_states
+        Number of hidden states per HMM
+    hmm_scheme
+        List of distribution names (``'gamma'`` or ``'exponential'``)
+        per modality
+    cell_type_scheme
+        List of tuples; each tuple specifies which cell-type indices
+        the corresponding HMM covers
+    hmm_name
+        Name identifier for the HMM system
+    inertia
+        Inertia parameter passed to pomegranate's DenseHMM
+    early_stop_tol
+        Early-stopping tolerance for training
+    pomegranate_densehmm_kwargs
+        Extra keyword arguments forwarded to ``pomegranate.hmm.DenseHMM``
+
+    Returns
+    -------
+    An :class:`HMMListWrapper` containing one HMM per scheme entry
+    """
     st_scheme_len = len(cell_type_scheme)
     return HMMListWrapper(
         [
@@ -105,6 +134,33 @@ def create_hmm(
         # init_states_from_wrapper: HMMWrapper | None = None,
         pomegranate_densehmm_kwargs: dict = {}
 ) -> HMMWrapper:
+    """Create a single Hidden Markov Model using pomegranate.
+
+    Builds a DenseHMM with the specified number of states and emission
+    distributions.  Distributions can be independent (one per modality)
+    or joint, depending on whether all entries in ``hmm_scheme`` are
+    identical.
+
+    Parameters
+    ----------
+    n_states
+        Number of hidden states
+    hmm_scheme
+        List of distribution names (``'gamma'`` or ``'exponential'``)
+        per modality
+    hmm_name
+        Name identifier for the model
+    inertia
+        Inertia parameter for training
+    early_stop_tol
+        Early-stopping tolerance
+    pomegranate_densehmm_kwargs
+        Extra keyword arguments forwarded to ``pomegranate.hmm.DenseHMM``
+
+    Returns
+    -------
+    An :class:`HMMWrapper` around the created model
+    """
     import pomegranate.hmm as phmm
     import pomegranate.distributions as pdist
 
@@ -174,6 +230,31 @@ def fit_hmm(
         data_sample_end: int = -1,
         pretrain_global: bool = True
 ):
+    """Fit an HMM (or HMM system) on the given data layers.
+
+    When an :class:`HMMListWrapper` is passed, each sub-model is trained
+    on its corresponding cell-type scheme.  If ``pretrain_global`` is
+    ``True``, a global model is trained first and its parameters are
+    used to initialise every sub-model.
+
+    Parameters
+    ----------
+    hmm
+        A single :class:`HMMWrapper` or an :class:`HMMListWrapper`
+    data
+        HMMData object containing the training observations
+    data_layers
+        Layer names to use as input features
+    shuffled
+        Whether to shuffle the data before training
+    data_sample_start
+        Start index for data sub-sampling
+    data_sample_end
+        End index for data sub-sampling (``-1`` = all)
+    pretrain_global
+        Pre-train a global model and copy its weights to all sub-models
+        (only applicable when ``hmm`` is an :class:`HMMListWrapper`)
+    """
 
     is_list = False
     if isinstance(hmm, HMMListWrapper):
@@ -220,6 +301,27 @@ def calculate_correlation(
         *,
         spearman: bool = True
 ) -> np.ndarray:
+    """Calculate correlation between original and reconstructed data.
+
+    Parameters
+    ----------
+    hmm
+        Fitted HMM model (single or list wrapper)
+    data
+        HMMData object with reconstructed data stored in supplementary
+    data_layers
+        List of layer names
+    original_data_name
+        Name of the original data layer to correlate against
+    reconstructed_data_name
+        Name of the reconstructed data in supplementary storage
+    spearman
+        Use Spearman correlation (Pearson not yet implemented)
+
+    Returns
+    -------
+    Array of correlation values
+    """
     rd = data.supp[hmm.name].reconstructed_data[reconstructed_data_name]
 
     if not spearman:

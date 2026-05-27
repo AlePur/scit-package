@@ -162,6 +162,27 @@ def classify_enrichment(
         enrich_g: float,
         q: float
 ):
+    """Classify features as enriched based on quantile-normalized thresholds.
+
+    A feature is classified as active when
+    ``(value - enrich_a) / (quantile^enrich_g - 1) > enrich_b``, where the
+    quantile is computed per feature at level ``q``.
+
+    Parameters
+    ----------
+    adata
+        AnnData object to classify
+    layer_config
+        LayerConfig specifying which layer to transform
+    enrich_a
+        Additive offset for the enrichment threshold
+    enrich_b
+        Multiplicative threshold after normalisation
+    enrich_g
+        Exponent applied to the quantile base in the denominator
+    q
+        Quantile (0–1) used to compute the per-feature baseline
+    """
     # s > a + b(mean)
     # (s - a) / mean > b
     X = layer_config.transform(adata, use_cached_mask=False).todense()
@@ -183,6 +204,27 @@ def neighborhood_activities(
         community_matrix: str = 'leiden_matrix',
         use_cached_mask: bool = False
 ) -> sps.csr_matrix | None:
+    """Compute neighbourhood activity profiles from community memberships.
+
+    Aggregates binary activity per community using the community membership
+    matrix stored in ``adata.obsm``, then stores the result in
+    ``adata.obsm`` and feature names in ``adata.uns``.
+
+    Parameters
+    ----------
+    adata
+        AnnData object with community memberships in ``.obsm``
+    layer_config
+        LayerConfig specifying which layer to transform
+    community_matrix
+        Key in ``adata.obsm`` for the community membership matrix
+    use_cached_mask
+        Whether to use a previously cached feature mask
+
+    Returns
+    -------
+    Sparse matrix of neighbourhood activities (or ``None`` if stored in-place)
+    """
     ArgAssert(community_matrix in adata.obsm.keys(), f'{community_matrix} not found in .obsm')
     communities: np.ndarray = adata.obsm[community_matrix].T.astype(np.uint32)
     

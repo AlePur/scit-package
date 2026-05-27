@@ -25,6 +25,21 @@ def regulatory_ensure_promoter_included(
         bin_adata: AnnData,
         gene_adata: AnnData
 ) -> None:
+    """
+    Ensure that promoter bins are included in the regulatory links.
+
+    For each gene, finds the bin that overlaps its promoter region and adds
+    it to the regulatory links if not already present.
+
+    Parameters
+    ----------
+    reg
+        :class:`RegInference` object to modify in-place
+    bin_adata
+        AnnData object with bin-level data (must have 'chr', 'start', 'end' in .var)
+    gene_adata
+        AnnData object with gene-level data (must have 'chr', 'start', 'end', 'promoter' in .var)
+    """
     toadd = []
     chrs = bin_adata.var['chr'].unique().to_numpy()
     for ch in chrs:
@@ -52,12 +67,19 @@ def get_regulatory_links(
         name: str
 ) -> list[str]:
     """
-    Get regulatory links as a list
+    Get regulatory links as a list for a given gene.
 
     Parameters
     ----------
     reg
+        :class:`RegInference` object containing regulatory links
     name
+        Gene name to look up regulatory links for
+
+    Returns
+    -------
+    list[str]
+        List of bin names that regulate the given gene
     """
     df = reg.df
     return df[df['name'] == name]['binname'].to_list()
@@ -75,13 +97,16 @@ def get_regulatory_matrix(
     Parameters
     ----------
     reg
+        :class:`RegInference` object containing regulatory links
     gene_features
-        Gene features to include
+        Gene features (names or indices) to include as rows
     bin_features
-        Bin features to include
+        Bin features (names or indices) to include as columns
 
     Returns
     -------
+    :class:`scipy.sparse.csr_matrix`
+        Sparse binary matrix of shape (len(gene_features), len(bin_features))
 
     """
     gene_features = np.array(gene_features)

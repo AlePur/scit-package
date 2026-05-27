@@ -39,6 +39,15 @@ logging = Logger()
 def set_verbosity_level(
         v: _verbosity_type
 ) -> None:
+    """Set the global logging verbosity level.
+
+    Parameters
+    ----------
+    v
+        Verbosity level: ``'all'`` shows info, warnings, and errors;
+        ``'no_info'`` shows warnings and errors only;
+        ``'error_only'`` shows errors only
+    """
     if v not in set(['all', 'no_info', 'error_only']):
         raise ValueError('invalid verbosity level')
     logging.v = v

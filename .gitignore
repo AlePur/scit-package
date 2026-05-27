@@ -9,7 +9,7 @@ src/**/*.c
 src/**/*.cpp
 src/**/*.so
 
-docs/build/
+# docs/build/
 venv/
 
 trash

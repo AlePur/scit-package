@@ -1,0 +1,138 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graph Tools (sparscit.gr) &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="_static/icon.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Embedding (sparscit.em)" href="src.embedding.html" />
+    <link rel="prev" title="Tools (sparscit.tl)" href="src.tools.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+      <li class="breadcrumb-item active">Graph Tools (<code class="docutils literal notranslate"><span class="pre">sparscit.gr</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.graph.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="graph-tools-sparscit-gr">
+<h1>Graph Tools (<code class="docutils literal notranslate"><span class="pre">sparscit.gr</span></code>)<a class="headerlink" href="#graph-tools-sparscit-gr" title="Link to this heading"></a></h1>
+<p>Tools for neighbor-graph construction, community detection, and label transfer.
+This submodule builds k-nearest-neighbor graphs, runs Leiden clustering,
+constructs community hierarchies, and provides kNN-based label transfer between
+datasets.</p>
+<section id="neighbor-graphs">
+<h2>Neighbor Graphs<a class="headerlink" href="#neighbor-graphs" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.graph._neighbors.knn()</span></code> — Build a k-nearest-neighbor graph</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.graph._neighbors.knn_impute()</span></code> — Impute values using k-nearest neighbors</p></li>
+</ul>
+</section>
+<section id="community-detection">
+<h2>Community Detection<a class="headerlink" href="#community-detection" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.graph._community.leiden()</span></code> — Leiden community detection</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.graph._community.community_hierarchy()</span></code> — Build hierarchical community tree</p></li>
+</ul>
+</section>
+<section id="label-transfer">
+<h2>Label Transfer<a class="headerlink" href="#label-transfer" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.graph._transfer.train_on_obs()</span></code> — Train kNN model on <code class="docutils literal notranslate"><span class="pre">.obs</span></code> values</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.graph._transfer.train_on_matrix()</span></code> — Train kNN model on matrix data</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.graph._transfer.predict()</span></code> — Predict labels using a trained kNN model</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.tools.html" class="btn btn-neutral float-left" title="Tools (sparscit.tl)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.embedding.html" class="btn btn-neutral float-right" title="Embedding (sparscit.em)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

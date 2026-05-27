@@ -1,0 +1,158 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced Plotting (sparscit.adv.pl) &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="_static/icon.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Advanced Tools (sparscit.adv)" href="src.advanced.default.html" />
+    <link rel="prev" title="Advanced (sparscit.adv)" href="src.advanced.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="src.advanced.html">Advanced (<code class="docutils literal notranslate"><span class="pre">sparscit.adv</span></code>)</a></li>
+      <li class="breadcrumb-item active">Advanced Plotting (<code class="docutils literal notranslate"><span class="pre">sparscit.adv.pl</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.advanced.plotting.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="advanced-plotting-sparscit-adv-pl">
+<h1>Advanced Plotting (<code class="docutils literal notranslate"><span class="pre">sparscit.adv.pl</span></code>)<a class="headerlink" href="#advanced-plotting-sparscit-adv-pl" title="Link to this heading"></a></h1>
+<p>Visualization functions for landscape plots, dynamics, HMMs, and summaries.</p>
+<section id="landscape-plots">
+<h2>Landscape Plots<a class="headerlink" href="#landscape-plots" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._2d.landscape2d()</span></code> — 2D landscape plot</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._2d.contour2d()</span></code> — 2D contour plot</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._2d.categorical2d()</span></code> — 2D categorical plot</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._3d.landscape3d()</span></code> — 3D landscape plot</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._function.slice()</span></code> — Slice a landscape</p></li>
+</ul>
+</section>
+<section id="dynamics-hmms">
+<h2>Dynamics &amp; HMMs<a class="headerlink" href="#dynamics-hmms" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._dynamics.time_correlation()</span></code> — Plot time correlations</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._dynamics.differential_dynamics()</span></code> — Plot differential dynamics</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._dynamics.summary_overtime()</span></code> — Plot summary over time</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._hmm.hidden_states()</span></code> — Plot HMM hidden states</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._hmm.hmm_observations()</span></code> — Plot HMM observations</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._hmm.hmm_likelihoods()</span></code> — Plot HMM likelihoods</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._hmm.transition_matrix()</span></code> — Plot HMM transition matrix</p></li>
+</ul>
+</section>
+<section id="community-features">
+<h2>Community &amp; Features<a class="headerlink" href="#community-features" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._distances.active_subclusters()</span></code> — Plot active sub-clusters</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._dendrogram.community_dendrogram()</span></code> — Plot community dendrogram</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._features.venn_active_overlap()</span></code> — Venn diagram of active feature overlap</p></li>
+</ul>
+</section>
+<section id="summaries">
+<h2>Summaries<a class="headerlink" href="#summaries" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._summary.summary_boxplot()</span></code> — Boxplot summary</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._summary.summary_heatmap()</span></code> — Heatmap summary</p></li>
+</ul>
+</section>
+<section id="color-utilities">
+<h2>Color Utilities<a class="headerlink" href="#color-utilities" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._cmap.custom_cmap()</span></code> — Create a custom colormap</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">src.advanced.plotting._cmap.draw_cbar()</span></code> — Draw a colorbar</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.advanced.html" class="btn btn-neutral float-left" title="Advanced (sparscit.adv)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.advanced.default.html" class="btn btn-neutral float-right" title="Advanced Tools (sparscit.adv)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -25,36 +25,6 @@ pip install -e .
 
 See [`requirements.txt`](requirements.txt) for the full list.
 
----
-
-## Quick Start
-
-```python
-import sparscit as sc
-
-# Configure global settings
-sc.set_defaults(n_jobs=-1, figsize=(10, 5))
-
-# Load data
-adata = sc.ld.fragments("fragments.tsv.gz", genome="hg38")
-
-# Filter cells and features
-sc.tl.filter(adata, layers=["counts"], min_obs_counts=[100])
-
-# Create layer configurations
-lc = sc.tl.make_layer_config(adata, layer="counts", normalize_with_obs_counts=True, log_transform=True)
-
-# Compute embeddings
-sc.em.pca(adata, lc)
-sc.em.spectral(adata, lc, n_components=30)
-
-# Build neighbor graph and cluster
-sc.gr.knn(adata, embedding_key="X_spectral")
-sc.gr.leiden(adata)
-
-# Visualize
-sc.pl.embedding2d(adata, "X_umap", color="leiden")
-```
 
 ---
 

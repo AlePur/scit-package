@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sparscit.embedding._landscape &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/icon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sparscit.embedding._landscape</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sparscit.embedding._landscape</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArgAssert</span><span class="p">,</span> <span class="n">_check_obs_uq</span><span class="p">,</span> <span class="n">_get_membership</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..advanced._landscape_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">LandscapeScaffold</span><span class="p">,</span> <span class="n">_verify_numeric</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..graph._neighbors</span><span class="w"> </span><span class="kn">import</span> <span class="n">_neighbor_graph</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..graph._graph</span><span class="w"> </span><span class="kn">import</span> <span class="n">Graph</span>
+
+<div class="viewcode-block" id="landscape">
+<a class="viewcode-back" href="../../../sparscit.embedding.html#sparscit.embedding.landscape">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">landscape</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">scaffold</span><span class="p">:</span> <span class="n">LandscapeScaffold</span><span class="p">,</span>
+        <span class="n">y_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">embedding_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">obsp_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">community_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;leiden&quot;</span><span class="p">,</span>
+        <span class="n">y_mean_init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">force_post_y</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="c1"># scaffold_scale: float = 1,</span>
+        <span class="n">umap_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">umap_spread</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">umap_min_dist</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+        <span class="n">return_coarse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create landscape based on neighborhood clusters, using leaf-clusters for inter-slice alignment.</span>
+<span class="sd">    This function uses information from `.obsp[&#39;distances&#39;]`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        AnnData object with neighbor graph in `.obsp`</span>
+<span class="sd">    scaffold</span>
+<span class="sd">        A :class:`LandscapeScaffold` instance identifying leaf-clusters</span>
+<span class="sd">    y_key</span>
+<span class="sd">        Key in `.obs` to use for y-coordinate of cell on landscape. This is usually (pseudo)time</span>
+<span class="sd">    embedding_key</span>
+<span class="sd">        Embedding to use in UMAP transform</span>
+<span class="sd">    obsp_key</span>
+<span class="sd">        Key in `.obsp` for connectivity matrix. If None, uses &#39;connectivities&#39;</span>
+<span class="sd">    community_key</span>
+<span class="sd">        Categorical key in `.obs` for communities</span>
+<span class="sd">    y_mean_init</span>
+<span class="sd">        Whether to use y_key per cell y-coordinate (continuous) or per cluster-mean for initial embedding</span>
+<span class="sd">    force_post_y</span>
+<span class="sd">        Whether to replace y-coordinate post-UMAP with y_key or leave new y-coordinate generated by UMAP</span>
+<span class="sd">    umap_epochs</span>
+<span class="sd">        How many UMAP epochs to run</span>
+<span class="sd">    umap_spread</span>
+<span class="sd">        UMAP spread parameter</span>
+<span class="sd">    umap_min_dist</span>
+<span class="sd">        UMAP min_dist parameter</span>
+<span class="sd">    return_coarse</span>
+<span class="sd">        Whether to return coarse embedding</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    `adata.obsm[&#39;X_landscape&#39;]`</span>
+<span class="sd">        Landscape embedding</span>
+
+<span class="sd">    `adata.obsm[&#39;X_coarse_landscape&#39;]`</span>
+<span class="sd">        Only if return_coarse is `True`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">graph</span> <span class="o">=</span> <span class="n">_neighbor_graph</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">obsp_key</span><span class="o">=</span><span class="n">obsp_key</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.notebook</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+    <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_upd</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+
+        <span class="n">ArgAssert</span><span class="p">(</span><span class="s1">&#39;distances&#39;</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsp</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;Distances are missing from .obsp&quot;</span><span class="p">)</span>
+        <span class="n">ArgAssert</span><span class="p">(</span><span class="n">embedding_key</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;embedding_key is missing from .obsm&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">umap_epochs</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The provded number of epochs might be too big. The landscape will become fragmented&quot;</span><span class="p">)</span>
+
+        <span class="n">_check_obs_uq</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+        <span class="n">_upd</span><span class="p">()</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">_check_graph</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+        <span class="n">scaffold</span><span class="o">.</span><span class="n">_check_obs</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+
+        <span class="c1">#new membership</span>
+        <span class="n">_membership</span> <span class="o">=</span> <span class="n">_get_membership</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">community_key</span><span class="p">)</span>
+        <span class="n">vcount</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">_membership</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">_verify_numeric</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">y_key</span><span class="p">)</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+        <span class="n">_upd</span><span class="p">()</span>
+        <span class="c1">### scaffold prepare</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">sorted_x</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">scaffold_cell_indices</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">sorted_x</span><span class="p">,</span> <span class="n">scaffold</span><span class="o">.</span><span class="n">obs_indices</span><span class="p">)]</span>
+
+        <span class="n">cells_by_cluster</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="n">_membership</span> <span class="o">==</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_membership</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+
+        <span class="n">n_scaffold_leaves</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">scaffold</span><span class="o">.</span><span class="n">memberships</span><span class="p">)</span>
+
+        <span class="c1">#membersips: leiden 0: [obs indices..], 1: [...], 2: [...] etc</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creating layout using </span><span class="si">{</span><span class="n">n_scaffold_leaves</span><span class="si">}</span><span class="s2"> leaf clusters&quot;</span><span class="p">)</span>
+        <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">scaffold</span><span class="o">.</span><span class="n">order</span><span class="p">)</span> <span class="o">/</span> <span class="n">scaffold</span><span class="o">.</span><span class="n">order</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+        <span class="n">_upd</span><span class="p">()</span>
+        <span class="c1">### do the layout</span>
+
+        <span class="c1"># TODO: what is this?</span>
+        <span class="c1"># weights based on how many barcodes are in the leaf clusters</span>
+        <span class="n">id_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cells_by_cluster</span><span class="p">[</span><span class="n">j</span><span class="p">]),</span> <span class="n">scaffold_cell_indices</span><span class="p">[</span><span class="n">scaffold</span><span class="o">.</span><span class="n">memberships</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_scaffold_leaves</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vcount</span><span class="p">)</span>
+        <span class="p">])</span>
+
+        <span class="n">_upd</span><span class="p">()</span>
+
+        <span class="c1"># weights based on how many edges to barcodes in the leaf clusters</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">)</span>
+        <span class="n">c_edges</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span>
+                <span class="n">edges</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cells_by_cluster</span><span class="p">[</span><span class="n">j</span><span class="p">]))][:,</span> <span class="mi">1</span><span class="p">],</span>
+                <span class="n">edges</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cells_by_cluster</span><span class="p">[</span><span class="n">j</span><span class="p">]))][:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="p">))]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vcount</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">c_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">c_edges</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">scaffold_cell_indices</span><span class="p">[</span><span class="n">scaffold</span><span class="o">.</span><span class="n">memberships</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_scaffold_leaves</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vcount</span><span class="p">)</span>
+        <span class="p">])</span>
+
+        <span class="n">_upd</span><span class="p">()</span>
+
+        <span class="n">_xlayout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">xs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">c_weights</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_scaffold_leaves</span><span class="p">)])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vcount</span><span class="p">)</span>
+        <span class="p">])</span>
+
+        <span class="n">magg</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">community_key</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">False</span><span class="p">)[[</span><span class="n">y_key</span><span class="p">]]</span><span class="o">.</span><span class="n">mean</span><span class="p">()[</span><span class="n">y_key</span><span class="p">]</span>
+        <span class="n">_adic</span> <span class="o">=</span> <span class="n">magg</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">magg</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">codes</span><span class="p">)]</span>
+        <span class="c1">#mean_age = np.array([_adic[i] for i in adata.obs[community_key]])</span>
+
+        <span class="n">cweightsum</span> <span class="o">=</span> <span class="n">c_weights</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">cweightsum</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are cells n=</span><span class="si">{</span><span class="p">(</span><span class="n">cweightsum</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s1"> that cannot be assigned to the scaffold (no edges)&#39;</span><span class="p">)</span>
+            <span class="n">cweightsum</span><span class="p">[</span><span class="n">cweightsum</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">_layout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span>
+            <span class="p">(</span><span class="n">_xlayout</span> <span class="o">/</span> <span class="n">cweightsum</span><span class="p">),</span>
+            <span class="o">-</span><span class="n">_adic</span>
+        <span class="p">]</span>
+
+        <span class="n">_upd</span><span class="p">()</span>
+
+        <span class="c1">### construct graph</span>
+
+        <span class="c1"># single cell level</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">_layout</span><span class="p">[</span><span class="n">_membership</span><span class="p">]</span>
+        <span class="c1">#X[:,0] *= scaffold_scale</span>
+
+        <span class="k">if</span> <span class="n">return_coarse</span><span class="p">:</span>
+            <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;X_coarse_landscape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1">### do the spreading</span>
+
+        <span class="k">if</span> <span class="n">y_mean_init</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">ykey</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">y_key</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">ykey</span><span class="p">]</span>
+
+        <span class="n">_upd</span><span class="p">()</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">umap</span><span class="w"> </span><span class="kn">import</span> <span class="n">UMAP</span>
+
+        <span class="n">_upd</span><span class="p">()</span>
+
+        <span class="n">ids</span><span class="p">,</span> <span class="n">dists</span> <span class="o">=</span> <span class="n">Graph</span><span class="o">.</span><span class="n">_umap_compatible</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obsp</span><span class="p">[</span><span class="s1">&#39;distances&#39;</span><span class="p">])</span>
+        <span class="n">X_umap</span> <span class="o">=</span> <span class="n">UMAP</span><span class="p">(</span>
+            <span class="n">n_neighbors</span><span class="o">=</span><span class="n">ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">n_epochs</span><span class="o">=</span><span class="n">umap_epochs</span><span class="p">,</span>
+            <span class="n">min_dist</span><span class="o">=</span><span class="n">umap_min_dist</span><span class="p">,</span>
+            <span class="n">spread</span><span class="o">=</span><span class="n">umap_spread</span><span class="p">,</span>
+            <span class="n">init</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>
+            <span class="n">precomputed_knn</span><span class="o">=</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">dists</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">embedding_key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">force_post_y</span><span class="p">:</span>
+            <span class="n">X_umap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">X_umap</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">ykey</span><span class="p">]</span>
+
+        <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;X_landscape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_umap</span>
+
+        <span class="n">_upd</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,349 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sparscit.tools._diffmap &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/icon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sparscit.tools._diffmap</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sparscit.tools._diffmap</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">issparse</span><span class="p">,</span> <span class="n">csr_matrix</span><span class="p">,</span> <span class="n">spdiags</span><span class="p">,</span> <span class="n">linalg</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArgAssert</span><span class="p">,</span> <span class="n">_get_memberships</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logging</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Diffmap</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Diffusion map computation for single-cell data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">connectivities</span><span class="p">:</span> <span class="n">csr_matrix</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectivities</span> <span class="o">=</span> <span class="n">connectivities</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_transitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">density_normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd">        Compute transition matrix.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        density_normalize</span>
+<span class="sd">            The density rescaling of Coifman and Lafon (2006): Then only the</span>
+<span class="sd">            geometry of the data matters, not the sampled density.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Makes attributes `.transitions_sym` and `.transitions` available.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivities</span>
+        <span class="c1"># density normalization as of Coifman et al. (2005)</span>
+        <span class="c1"># ensures that kernel matrix is independent of sampling density</span>
+        <span class="k">if</span> <span class="n">density_normalize</span><span class="p">:</span>
+            <span class="c1"># q[i] is an estimate for the sampling density at point i</span>
+            <span class="c1"># it&#39;s also the degree of the underlying graph</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">W</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+            <span class="n">Q</span> <span class="o">=</span> <span class="n">spdiags</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">q</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">W</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">W</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">K</span> <span class="o">=</span> <span class="n">Q</span> <span class="o">@</span> <span class="n">W</span> <span class="o">@</span> <span class="n">Q</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">K</span> <span class="o">=</span> <span class="n">W</span>
+
+        <span class="c1"># z[i] is the square root of the row sum of K</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">=</span> <span class="n">spdiags</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">z</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transitions_sym</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">@</span> <span class="n">K</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_eigen</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">n_comps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
+            <span class="n">sort_increase</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd">        Compute eigen decomposition of transition matrix.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n_comps</span>
+<span class="sd">            Number of eigenvalues/vectors to be computed, set `n_comps = 0` if</span>
+<span class="sd">            you need all eigenvectors.</span>
+<span class="sd">        sort_increase</span>
+<span class="sd">            Whether to sort eigenvalues in increasing order</span>
+<span class="sd">        random_state</span>
+<span class="sd">            A numpy random seed</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Writes the following attributes.</span>
+
+<span class="sd">        eigen_values : :class:`~numpy.ndarray`</span>
+<span class="sd">            Eigenvalues of transition matrix.</span>
+<span class="sd">        eigen_basis : :class:`~numpy.ndarray`</span>
+<span class="sd">            Matrix of eigenvectors (stored in columns). `.eigen_basis` is</span>
+<span class="sd">            projection of data matrix on right eigenvectors, that is, the</span>
+<span class="sd">            projection on the diffusion components. These are simply the</span>
+<span class="sd">            components of the right eigenvectors and can directly be used for</span>
+<span class="sd">            plotting.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions_sym</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Run `.compute_transitions` first.&quot;</span><span class="p">)</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions_sym</span>
+
+        <span class="n">n_comps</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_comps</span><span class="p">)</span>
+        <span class="c1"># ncv = max(2 * n_comps + 1, int(np.sqrt(matrix.shape[0])))</span>
+        <span class="n">ncv</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">which</span> <span class="o">=</span> <span class="s2">&quot;SM&quot;</span> <span class="k">if</span> <span class="n">sort_increase</span> <span class="k">else</span> <span class="s2">&quot;LM&quot;</span>
+        <span class="c1"># it pays off to increase the stability with a bit more precision</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+        <span class="c1"># Setting the random initial vector</span>
+        <span class="n">gen</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="n">v0</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">evals</span><span class="p">,</span> <span class="n">evecs</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">eigsh</span><span class="p">(</span>
+            <span class="n">matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">n_comps</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="n">which</span><span class="p">,</span> <span class="n">ncv</span><span class="o">=</span><span class="n">ncv</span><span class="p">,</span> <span class="n">v0</span><span class="o">=</span><span class="n">v0</span>
+        <span class="p">)</span>
+        <span class="n">evals</span><span class="p">,</span> <span class="n">evecs</span> <span class="o">=</span> <span class="n">evals</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">evecs</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sort_increase</span><span class="p">:</span>
+            <span class="n">evals</span> <span class="o">=</span> <span class="n">evals</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">evecs</span> <span class="o">=</span> <span class="n">evecs</span><span class="p">[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">eigen_values</span> <span class="o">=</span> <span class="n">evals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eigen_basis</span> <span class="o">=</span> <span class="n">evecs</span>
+
+<div class="viewcode-block" id="diffmap">
+<a class="viewcode-back" href="../../../sparscit.tools.html#sparscit.tools.diffmap">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">diffmap</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">obsp_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;connectivities&#39;</span><span class="p">,</span>
+        <span class="n">n_comps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute diffusion maps.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        AnnData object with connectivities in `.obsp`</span>
+<span class="sd">    obsp_key</span>
+<span class="sd">        Key in `.obsp` for the connectivity matrix</span>
+<span class="sd">    n_comps</span>
+<span class="sd">        Number of diffusion components to compute</span>
+<span class="sd">    random_state</span>
+<span class="sd">        Random seed for eigen decomposition</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    eigen_values</span>
+<span class="sd">        Eigenvalues for each component</span>
+<span class="sd">    `adata.obsm[&#39;X_diffmap&#39;]`</span>
+<span class="sd">        Diffusion map embedding</span>
+<span class="sd">    `adata.uns[&#39;X_diffmap_evals&#39;]`</span>
+<span class="sd">        Eigenvalues stored in `.uns`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">dpt</span> <span class="o">=</span> <span class="n">Diffmap</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obsp</span><span class="p">[</span><span class="n">obsp_key</span><span class="p">])</span>
+    <span class="n">dpt</span><span class="o">.</span><span class="n">compute_transitions</span><span class="p">()</span>
+    <span class="n">dpt</span><span class="o">.</span><span class="n">compute_eigen</span><span class="p">(</span><span class="n">n_comps</span><span class="o">=</span><span class="n">n_comps</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s2">&quot;X_diffmap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dpt</span><span class="o">.</span><span class="n">eigen_basis</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s2">&quot;X_diffmap_evals&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dpt</span><span class="o">.</span><span class="n">eigen_values</span>
+    <span class="k">return</span> <span class="n">dpt</span><span class="o">.</span><span class="n">eigen_values</span></div>
+
+
+
+<div class="viewcode-block" id="diffusion_pseudotime">
+<a class="viewcode-back" href="../../../sparscit.tools.html#sparscit.tools.diffusion_pseudotime">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">diffusion_pseudotime</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">root_cell</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd">    Compute diffusion pseudotime (DPT).</span>
+
+<span class="sd">    Infer progression of cells through geodesic distance along the graph.</span>
+<span class="sd">    Based on Haghverdi et al. (2016) and Wolf et al. (2019).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        AnnData object with diffusion map in `.obsm[&#39;X_diffmap&#39;]` and distances in `.obsp[&#39;distances&#39;]`</span>
+<span class="sd">    root_cell</span>
+<span class="sd">        Root cell index</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    `adata.obs[&#39;dpt_pseudotime&#39;]`</span>
+<span class="sd">        DPT distance with respect to the root cell</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ArgAssert</span><span class="p">(</span><span class="s1">&#39;distances&#39;</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsp</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;Distances not in adata.obsp&quot;</span><span class="p">)</span>
+    <span class="n">ArgAssert</span><span class="p">(</span><span class="s2">&quot;X_diffmap&quot;</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;Diffmap not found in adata.obsm&quot;</span><span class="p">)</span>
+
+    <span class="n">eigen_basis</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;X_diffmap&#39;</span><span class="p">]</span>
+    <span class="n">eigen_values</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s2">&quot;X_diffmap_evals&quot;</span><span class="p">]</span>
+
+    <span class="n">i</span> <span class="o">=</span> <span class="n">root_cell</span>
+    <span class="n">pseudotime</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="p">(</span>
+                <span class="n">eigen_values</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">eigen_values</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                <span class="o">*</span> <span class="p">(</span><span class="n">eigen_basis</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">eigen_basis</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="o">**</span> <span class="mi">2</span>
+        <span class="c1"># account for float32 precision</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">eigen_values</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">eigen_values</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.9994</span>
+    <span class="p">)</span>
+
+    <span class="n">pseudotime</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">eigen_basis</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">eigen_basis</span><span class="p">[:,</span> <span class="n">k</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">eigen_values</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">eigen_values</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.9994</span>
+    <span class="p">)</span>
+    <span class="n">pseudotime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pseudotime</span><span class="p">)</span>
+    <span class="n">pseudotime</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">pseudotime</span><span class="p">[</span><span class="n">pseudotime</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">])</span>
+
+    <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s2">&quot;dpt_pseudotime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pseudotime</span></div>
+
+
+
+<div class="viewcode-block" id="normalize_time_per_cluster">
+<a class="viewcode-back" href="../../../sparscit.tools.html#sparscit.tools.normalize_time_per_cluster">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">normalize_time_per_cluster</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">time_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">group_key</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalize time per-cluster. Returns normalized time.</span>
+
+<span class="sd">    For each group, shifts time so the minimum is zero, then rescales</span>
+<span class="sd">    to the original global range.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        Annotated data matrix</span>
+<span class="sd">    time_key</span>
+<span class="sd">        Key in ``adata.obs`` containing the time/pseudotime values</span>
+<span class="sd">    group_key</span>
+<span class="sd">        Key in ``adata.obs`` defining cluster memberships (categorical)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Normalized time values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cats</span><span class="p">,</span> <span class="n">cat_names</span><span class="p">,</span> <span class="n">uq_cats</span> <span class="o">=</span> <span class="n">_get_memberships</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">group_key</span><span class="p">)</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">time_key</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">minmax</span> <span class="o">=</span> <span class="p">(</span><span class="n">times</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">times</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">uq</span> <span class="ow">in</span> <span class="n">uq_cats</span><span class="p">:</span>
+        <span class="n">times</span><span class="p">[</span><span class="n">cats</span> <span class="o">==</span> <span class="n">uq</span><span class="p">]</span> <span class="o">-=</span> <span class="n">times</span><span class="p">[</span><span class="n">cats</span> <span class="o">==</span> <span class="n">uq</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">nmax</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="n">cats</span> <span class="o">==</span> <span class="n">uq</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">nmax</span> <span class="o">&lt;</span> <span class="mf">0.00004</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Extremely small value, probably caused by extremely small group. Skipping group </span><span class="si">{</span><span class="n">uq</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">nmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">times</span><span class="p">[</span><span class="n">cats</span> <span class="o">==</span> <span class="n">uq</span><span class="p">]</span> <span class="o">/=</span> <span class="n">nmax</span>
+        <span class="n">times</span><span class="p">[</span><span class="n">cats</span> <span class="o">==</span> <span class="n">uq</span><span class="p">]</span> <span class="o">*=</span> <span class="n">minmax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">minmax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">times</span><span class="p">[</span><span class="n">cats</span> <span class="o">==</span> <span class="n">uq</span><span class="p">]</span> <span class="o">+=</span> <span class="n">minmax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">times</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

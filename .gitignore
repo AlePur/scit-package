@@ -8,6 +8,7 @@ data/**
 src/**/*.c
 src/**/*.cpp
 src/**/*.so
+src/*.egg-info
 
 # docs/build/
 venv/

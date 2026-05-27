@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Embedding (sparscit.em) &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="_static/icon.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Plotting (sparscit.pl)" href="sparscit.plotting.html" />
+    <link rel="prev" title="Graph Tools (sparscit.gr)" href="sparscit.graph.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+      <li class="breadcrumb-item active">Embedding (<code class="docutils literal notranslate"><span class="pre">sparscit.em</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/sparscit.embedding.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="embedding-sparscit-em">
+<h1>Embedding (<code class="docutils literal notranslate"><span class="pre">sparscit.em</span></code>)<a class="headerlink" href="#embedding-sparscit-em" title="Link to this heading"></a></h1>
+<p>Dimensionality reduction and embedding methods for single-cell data.
+Includes PCA, spectral embedding, UMAP, dendrogram, and landscape embedding.</p>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.embedding._pca.pca()</span></code> — Principal Component Analysis</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.embedding._spectral.spectral()</span></code> — Spectral embedding for sparse data</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.embedding._spectral.multiview_spectral()</span></code> — Multi-view spectral embedding</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.embedding._umap.umap()</span></code> — UMAP embedding</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.embedding._dendrogram.dendrogram()</span></code> — Compute dendrogram</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.embedding._landscape.landscape()</span></code> — Create landscape embedding from neighborhood clusters</p></li>
+</ul>
+<dl class="py function" id="module-sparscit.embedding">
+<dt class="sig sig-object py" id="sparscit.embedding.dendrogram">
+<span class="sig-prename descclassname"><span class="pre">sparscit.embedding.</span></span><span class="sig-name descname"><span class="pre">dendrogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/sparscit/embedding/_dendrogram.html#dendrogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.embedding.dendrogram" title="Link to this definition"></a></dt>
+<dd><p>Create embedding based on dendrogram order.</p>
+<p>Writes a 2D embedding into <code class="docutils literal notranslate"><span class="pre">adata.obsm['X_dendrogram']</span></code> where the x-coordinate
+is derived from community tree ordering and the y-coordinate from the specified
+observation key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – Annotated data matrix with community tree information in <code class="docutils literal notranslate"><span class="pre">adata.uns</span></code></p></li>
+<li><p><strong>y_key</strong> – Key in .obs to use for y-coordinate of cell on embedding</p></li>
+<li><p><strong>random_seed</strong> – Random seed for jitter applied to x-coordinates</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>None</em> – Writes the result into <code class="docutils literal notranslate"><span class="pre">adata.obsm['X_dendrogram']</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.embedding.landscape">
+<span class="sig-prename descclassname"><span class="pre">sparscit.embedding.</span></span><span class="sig-name descname"><span class="pre">landscape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaffold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LandscapeScaffold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">obsp_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">community_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'leiden'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_mean_init</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_post_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umap_epochs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umap_spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umap_min_dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_coarse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/sparscit/embedding/_landscape.html#landscape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.embedding.landscape" title="Link to this definition"></a></dt>
+<dd><p>Create landscape based on neighborhood clusters, using leaf-clusters for inter-slice alignment.
+This function uses information from <cite>.obsp[‘distances’]</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData object with neighbor graph in <cite>.obsp</cite></p></li>
+<li><p><strong>scaffold</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">LandscapeScaffold</span></code> instance identifying leaf-clusters</p></li>
+<li><p><strong>y_key</strong> – Key in <cite>.obs</cite> to use for y-coordinate of cell on landscape. This is usually (pseudo)time</p></li>
+<li><p><strong>embedding_key</strong> – Embedding to use in UMAP transform</p></li>
+<li><p><strong>obsp_key</strong> – Key in <cite>.obsp</cite> for connectivity matrix. If None, uses ‘connectivities’</p></li>
+<li><p><strong>community_key</strong> – Categorical key in <cite>.obs</cite> for communities</p></li>
+<li><p><strong>y_mean_init</strong> – Whether to use y_key per cell y-coordinate (continuous) or per cluster-mean for initial embedding</p></li>
+<li><p><strong>force_post_y</strong> – Whether to replace y-coordinate post-UMAP with y_key or leave new y-coordinate generated by UMAP</p></li>
+<li><p><strong>umap_epochs</strong> – How many UMAP epochs to run</p></li>
+<li><p><strong>umap_spread</strong> – UMAP spread parameter</p></li>
+<li><p><strong>umap_min_dist</strong> – UMAP min_dist parameter</p></li>
+<li><p><strong>return_coarse</strong> – Whether to return coarse embedding</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><cite>adata.obsm[‘X_landscape’]</cite> – Landscape embedding</p></li>
+<li><p><cite>adata.obsm[‘X_coarse_landscape’]</cite> – Only if return_coarse is <cite>True</cite></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.embedding.multiview_spectral">
+<span class="sig-prename descclassname"><span class="pre">sparscit.embedding.</span></span><span class="sig-name descname"><span class="pre">multiview_spectral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_all_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_idf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighted_by_sd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/sparscit/embedding/_spectral.html#multiview_spectral"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.embedding.multiview_spectral" title="Link to this definition"></a></dt>
+<dd><p>Multiview spectral embedding. Adapted from SnapATAC2, DOI: <cite>10.1038/s41592-023-02139-9</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData object with data in <cite>.layers</cite></p></li>
+<li><p><strong>layers</strong> – List of layer keys to use for multi-view embedding</p></li>
+<li><p><strong>layer_weights</strong> – List of floats with layer importances. If None, equal weights are used</p></li>
+<li><p><strong>n_components</strong> – Number of components to generate</p></li>
+<li><p><strong>random_seed</strong> – Random seed for sampling data. If set to None, a seed is generated internally</p></li>
+<li><p><strong>use_all_features</strong> – Whether to use all features (ignoring <cite>.var[‘exclude’]</cite>)</p></li>
+<li><p><strong>skip_idf</strong> – Skip IDF transformation. This is not recommended!</p></li>
+<li><p><strong>weighted_by_sd</strong> – Whether to weight eigenvectors by the square root of eigenvalues</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><cite>adata.obsm[‘X_multi_spectral’]</cite> – Embedding of dimensions (n, n_components)</p></li>
+<li><p><em>eigenvalues</em> – Eigenvalues that can be plotted with <code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.pl.explained_variance_ratio()</span></code></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.embedding.pca">
+<span class="sig-prename descclassname"><span class="pre">sparscit.embedding.</span></span><span class="sig-name descname"><span class="pre">pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/sparscit/embedding/_pca.html#pca"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.embedding.pca" title="Link to this definition"></a></dt>
+<dd><p>PCA using <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.decomposition.PCA</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData object</p></li>
+<li><p><strong>embedding_key</strong> – Key of embedding in <cite>.obsm</cite> to transform</p></li>
+<li><p><strong>layer_key</strong> – Alternatively, a layer can be transformed if this key is provided</p></li>
+<li><p><strong>n_components</strong> – Number of principal components to keep</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><cite>adata.obsm[‘X_pca’]</cite> – PCA embedding</p></li>
+<li><p><em>variance_ratio</em> – Variance ratio which can be plotted with <code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.pl.explained_variance_ratio()</span></code></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.embedding.spectral">
+<span class="sig-prename descclassname"><span class="pre">sparscit.embedding.</span></span><span class="sig-name descname"><span class="pre">spectral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_all_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighted_by_sd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/sparscit/embedding/_spectral.html#spectral"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.embedding.spectral" title="Link to this definition"></a></dt>
+<dd><p>Spectral embedding. Adapted from SnapATAC2, DOI: <cite>10.1038/s41592-023-02139-9</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData object with data in <cite>.layers</cite></p></li>
+<li><p><strong>layer</strong> – Layer key for spectral embedding</p></li>
+<li><p><strong>n_components</strong> – Number of components to generate</p></li>
+<li><p><strong>use_all_features</strong> – Whether to use all features (ignoring <cite>.var[‘exclude’]</cite>)</p></li>
+<li><p><strong>weighted_by_sd</strong> – Whether to weight eigenvectors by the square root of eigenvalues</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><cite>adata.obsm[‘X_spectral’]</cite> – Embedding of dimensions (n, n_components)</p></li>
+<li><p><em>eigenvalues</em> – Eigenvalues that can be plotted with <code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.pl.explained_variance_ratio()</span></code></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.embedding.umap">
+<span class="sig-prename descclassname"><span class="pre">sparscit.embedding.</span></span><span class="sig-name descname"><span class="pre">umap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neighbors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umap_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/sparscit/embedding/_umap.html#umap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.embedding.umap" title="Link to this definition"></a></dt>
+<dd><p>UMAP 2D embedding</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData object with embedding in <cite>.obsm</cite></p></li>
+<li><p><strong>embedding_key</strong> – Which embedding to transform in <cite>.obsm</cite></p></li>
+<li><p><strong>n_neighbors</strong> – Number of neighbors to consider for calculating UMAP</p></li>
+<li><p><strong>umap_kwargs</strong> – Additional keyword arguments passed to <code class="xref py py-class docutils literal notranslate"><span class="pre">umap.UMAP</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>adata.obsm[“X_umap”]</cite> – UMAP embedding</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="sparscit.graph.html" class="btn btn-neutral float-left" title="Graph Tools (sparscit.gr)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="sparscit.plotting.html" class="btn btn-neutral float-right" title="Plotting (sparscit.pl)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

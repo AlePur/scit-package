@@ -1,0 +1,196 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced (sparscit.adv) &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="_static/icon.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Advanced Plotting (sparscit.adv.pl)" href="sparscit.advanced.plotting.html" />
+    <link rel="prev" title="Interface (sparscit.pl.int)" href="sparscit.plotting.int.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+      <li class="breadcrumb-item active">Advanced (<code class="docutils literal notranslate"><span class="pre">sparscit.adv</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/sparscit.advanced.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="advanced-sparscit-adv">
+<h1>Advanced (<code class="docutils literal notranslate"><span class="pre">sparscit.adv</span></code>)<a class="headerlink" href="#advanced-sparscit-adv" title="Link to this heading"></a></h1>
+<p>Advanced analysis tools for landscape dynamics, HMMs, grid-based analysis,
+and enrichment classification. This submodule contains functions that may not
+be relevant for all experiments but provide powerful capabilities for in-depth
+analysis.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sparscit.advanced.plotting.html">Advanced Plotting (<code class="docutils literal notranslate"><span class="pre">sparscit.adv.pl</span></code>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sparscit.advanced.plotting.html#landscape-plots">Landscape Plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparscit.advanced.plotting.html#dynamics-hmms">Dynamics &amp; HMMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparscit.advanced.plotting.html#community-features">Community &amp; Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparscit.advanced.plotting.html#summaries">Summaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparscit.advanced.plotting.html#color-utilities">Color Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.active_subclusters"><code class="docutils literal notranslate"><span class="pre">active_subclusters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.categorical2d"><code class="docutils literal notranslate"><span class="pre">categorical2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.community_dendrogram"><code class="docutils literal notranslate"><span class="pre">community_dendrogram()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.contour2d"><code class="docutils literal notranslate"><span class="pre">contour2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.custom_cmap"><code class="docutils literal notranslate"><span class="pre">custom_cmap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.differential_dynamics"><code class="docutils literal notranslate"><span class="pre">differential_dynamics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.draw_cbar"><code class="docutils literal notranslate"><span class="pre">draw_cbar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.hidden_states"><code class="docutils literal notranslate"><span class="pre">hidden_states()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.hmm_likelihoods"><code class="docutils literal notranslate"><span class="pre">hmm_likelihoods()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.hmm_observations"><code class="docutils literal notranslate"><span class="pre">hmm_observations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.landscape2d"><code class="docutils literal notranslate"><span class="pre">landscape2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.landscape3d"><code class="docutils literal notranslate"><span class="pre">landscape3d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.slice"><code class="docutils literal notranslate"><span class="pre">slice()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.summary_boxplot"><code class="docutils literal notranslate"><span class="pre">summary_boxplot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.summary_heatmap"><code class="docutils literal notranslate"><span class="pre">summary_heatmap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.summary_overtime"><code class="docutils literal notranslate"><span class="pre">summary_overtime()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.time_correlation"><code class="docutils literal notranslate"><span class="pre">time_correlation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.transition_matrix"><code class="docutils literal notranslate"><span class="pre">transition_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.plotting.html#sparscit.advanced.plotting.venn_active_overlap"><code class="docutils literal notranslate"><span class="pre">venn_active_overlap()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sparscit.advanced.default.html">Advanced Tools (<code class="docutils literal notranslate"><span class="pre">sparscit.adv</span></code>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sparscit.advanced.default.html#landscape-grid">Landscape &amp; Grid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparscit.advanced.default.html#dynamics-hmms">Dynamics &amp; HMMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparscit.advanced.default.html#community-enrichment">Community &amp; Enrichment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparscit.advanced.default.html#features-summaries">Features &amp; Summaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparscit.advanced.default.html#utilities">Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.ImageToolsCV2"><code class="docutils literal notranslate"><span class="pre">ImageToolsCV2</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.ImageToolsCV2.crop_white"><code class="docutils literal notranslate"><span class="pre">ImageToolsCV2.crop_white()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.ImageToolsCV2.fig_to_img"><code class="docutils literal notranslate"><span class="pre">ImageToolsCV2.fig_to_img()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.ImageToolsCV2.join_figures"><code class="docutils literal notranslate"><span class="pre">ImageToolsCV2.join_figures()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.ImageToolsCV2.overlay_images"><code class="docutils literal notranslate"><span class="pre">ImageToolsCV2.overlay_images()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.align_features"><code class="docutils literal notranslate"><span class="pre">align_features()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.binary_active_feature"><code class="docutils literal notranslate"><span class="pre">binary_active_feature()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.calculate_correlation"><code class="docutils literal notranslate"><span class="pre">calculate_correlation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.classify_enrichment"><code class="docutils literal notranslate"><span class="pre">classify_enrichment()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.cluster_summaries"><code class="docutils literal notranslate"><span class="pre">cluster_summaries()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.cocluster_summaries"><code class="docutils literal notranslate"><span class="pre">cocluster_summaries()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.create_hmm"><code class="docutils literal notranslate"><span class="pre">create_hmm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.create_hmm_system"><code class="docutils literal notranslate"><span class="pre">create_hmm_system()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.create_landscape_scaffold"><code class="docutils literal notranslate"><span class="pre">create_landscape_scaffold()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.dense_binary_activity_matrix"><code class="docutils literal notranslate"><span class="pre">dense_binary_activity_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.dynamics_add_expression_data"><code class="docutils literal notranslate"><span class="pre">dynamics_add_expression_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.feature_to_bed"><code class="docutils literal notranslate"><span class="pre">feature_to_bed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.fit_hmm"><code class="docutils literal notranslate"><span class="pre">fit_hmm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.get_assortativity"><code class="docutils literal notranslate"><span class="pre">get_assortativity()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.get_probabilities"><code class="docutils literal notranslate"><span class="pre">get_probabilities()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.griddata_apply_transformations"><code class="docutils literal notranslate"><span class="pre">griddata_apply_transformations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.griddata_categorical"><code class="docutils literal notranslate"><span class="pre">griddata_categorical()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.griddata_correlations"><code class="docutils literal notranslate"><span class="pre">griddata_correlations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.griddata_numerical"><code class="docutils literal notranslate"><span class="pre">griddata_numerical()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.landscape_dynamics"><code class="docutils literal notranslate"><span class="pre">landscape_dynamics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.leiden_matrix"><code class="docutils literal notranslate"><span class="pre">leiden_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.make_color_summary"><code class="docutils literal notranslate"><span class="pre">make_color_summary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.make_grid"><code class="docutils literal notranslate"><span class="pre">make_grid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.multi_color_copy"><code class="docutils literal notranslate"><span class="pre">multi_color_copy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.neighborhood_activities"><code class="docutils literal notranslate"><span class="pre">neighborhood_activities()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.predict_observations"><code class="docutils literal notranslate"><span class="pre">predict_observations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.random_neighborhood_matrix"><code class="docutils literal notranslate"><span class="pre">random_neighborhood_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.same_grid"><code class="docutils literal notranslate"><span class="pre">same_grid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.shannon_entropy"><code class="docutils literal notranslate"><span class="pre">shannon_entropy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparscit.advanced.default.html#sparscit.advanced.silhouette_score"><code class="docutils literal notranslate"><span class="pre">silhouette_score()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="sparscit.plotting.int.html" class="btn btn-neutral float-left" title="Interface (sparscit.pl.int)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="sparscit.advanced.plotting.html" class="btn btn-neutral float-right" title="Advanced Plotting (sparscit.adv.pl)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

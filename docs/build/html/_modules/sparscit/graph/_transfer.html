@@ -1,0 +1,376 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sparscit.graph._transfer &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/icon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sparscit.graph._transfer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sparscit.graph._transfer</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Self</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">csr_matrix</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.neighbors</span><span class="w"> </span><span class="kn">import</span> <span class="n">KNeighborsClassifier</span><span class="p">,</span> <span class="n">KNeighborsRegressor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas.api.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_numeric_dtype</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._utils._kwargs</span><span class="w"> </span><span class="kn">import</span> <span class="n">_format_kwargs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArgAssert</span>
+
+<span class="n">_method_type</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="s1">&#39;frequent&#39;</span><span class="p">,</span> <span class="s1">&#39;random&#39;</span><span class="p">]</span>
+<span class="n">_wtargets</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">,</span> <span class="s1">&#39;obsm&#39;</span><span class="p">,</span> <span class="s1">&#39;layers&#39;</span><span class="p">,</span> <span class="s1">&#39;uns&#39;</span><span class="p">]</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">KnnPredict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    k-Nearest Neighbor predictor that can transfer data between AnnData objects.</span>
+
+<span class="sd">    Stores a trained sklearn KNeighborsClassifier or KNeighborsRegressor</span>
+<span class="sd">    and uses it to predict values for new data based on a shared embedding.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    embedding_key : str</span>
+<span class="sd">        Key in `.obsm` for the embedding used for prediction</span>
+<span class="sd">    regression : bool</span>
+<span class="sd">        Whether the predictor uses regression (True) or classification (False)</span>
+<span class="sd">    categories : numpy.ndarray or None</span>
+<span class="sd">        Category labels if classification, None otherwise</span>
+<span class="sd">    categorical : bool</span>
+<span class="sd">        Whether the target is categorical</span>
+<span class="sd">    trained_on : int</span>
+<span class="sd">        Number of cells the predictor was trained on</span>
+<span class="sd">    cat_dict : numpy.ndarray or None</span>
+<span class="sd">        Category dictionary for classification</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_markdown_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;KnnPredict trained on </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trained_on</span><span class="p">)</span><span class="si">}</span><span class="s2"> cells, </span>
+<span class="s2">             regression=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">regression</span><span class="si">}</span><span class="s2">, embedding_key=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_key</span><span class="si">}</span><span class="s2">&#39;&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">embedding_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">regression</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+            <span class="n">knn_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="n">categorical</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">cat_dict</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding_key</span> <span class="o">=</span> <span class="n">embedding_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regression</span> <span class="o">=</span> <span class="n">regression</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categories</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categorical</span> <span class="o">=</span> <span class="n">categorical</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trained_on</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cat_dict</span> <span class="o">=</span> <span class="n">cat_dict</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">regression</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">internal</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span><span class="o">**</span><span class="n">knn_kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">internal</span> <span class="o">=</span> <span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="o">**</span><span class="n">knn_kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">learn</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+            <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trained_on</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">internal</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_key</span><span class="p">],</span> <span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">query_manifold</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">query_adata</span><span class="p">:</span> <span class="n">AnnData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict values for new data using the trained kNN model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        query_manifold</span>
+<span class="sd">            Pre-computed embedding for the query data. If None, uses ``query_adata.obsm[self.embedding_key]``</span>
+<span class="sd">        query_adata</span>
+<span class="sd">            Target AnnData object (used only if ``query_manifold`` is None)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            Predicted values (class labels for classification, continuous values for regression)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Predicting new data for AnnData based on .obsm[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_key</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span>
+        <span class="n">ArgAssert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_key</span> <span class="ow">in</span> <span class="n">query_adata</span><span class="o">.</span><span class="n">obsm</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_key</span><span class="si">}</span><span class="s1"> not found in adata.obsm&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">query_manifold</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query_manifold</span> <span class="o">=</span> <span class="n">query_adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">internal</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">query_manifold</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="predict">
+<a class="viewcode-back" href="../../../sparscit.graph.html#sparscit.graph.predict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">predictor</span><span class="p">:</span> <span class="n">KnnPredict</span><span class="p">,</span>
+        <span class="n">write_to</span><span class="p">:</span> <span class="n">_wtargets</span><span class="p">,</span>
+        <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Predict new values based on trained :class:`KnnPredict`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        Target AnnData</span>
+<span class="sd">    predictor</span>
+<span class="sd">        :class:`KnnPredict`</span>
+<span class="sd">    write_to</span>
+<span class="sd">        Destination to write to in target AnnData. Possible targets are &#39;obs&#39;, &#39;uns&#39;, &#39;obsm&#39; and &#39;layers&#39;</span>
+<span class="sd">    alias</span>
+<span class="sd">        Key for newly predicted data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">new</span> <span class="o">=</span> <span class="n">predictor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">query_adata</span><span class="o">=</span><span class="n">adata</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">write_to</span> <span class="o">==</span> <span class="s1">&#39;obs&#39;</span><span class="p">:</span>
+        <span class="n">new_c</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([</span><span class="n">predictor</span><span class="o">.</span><span class="n">cat_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">new</span><span class="p">],</span> <span class="n">categories</span><span class="o">=</span><span class="n">predictor</span><span class="o">.</span><span class="n">cat_dict</span><span class="p">)</span> <span class="k">if</span> <span class="n">predictor</span><span class="o">.</span><span class="n">categorical</span> <span class="k">else</span> <span class="n">new</span>
+        <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">alias</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_c</span>
+    <span class="k">elif</span> <span class="n">write_to</span> <span class="o">==</span> <span class="s1">&#39;uns&#39;</span><span class="p">:</span>
+        <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="n">alias</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span>
+    <span class="k">elif</span> <span class="n">write_to</span> <span class="o">==</span> <span class="s1">&#39;obsm&#39;</span><span class="p">:</span>
+        <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">alias</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span>
+    <span class="k">elif</span> <span class="n">write_to</span> <span class="o">==</span> <span class="s1">&#39;layers&#39;</span><span class="p">:</span>
+        <span class="n">adata</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">alias</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Writing to .</span><span class="si">{</span><span class="n">write_to</span><span class="si">}</span><span class="s1"> is not supported&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="train_on_obs">
+<a class="viewcode-back" href="../../../sparscit.graph.html#sparscit.graph.train_on_obs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_on_obs</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">embedding_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">obs_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">regression</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">n_neighbors</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="s1">&#39;distance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;distance&#39;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KnnPredict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Train on .obs data using either kNN regression or classification.</span>
+<span class="sd">    Works for both numerical and categorical data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        Adata with the obs values to transfer</span>
+<span class="sd">    embedding_key</span>
+<span class="sd">        Embedding key of a shared embedding of learning and target adatas</span>
+<span class="sd">    obs_key</span>
+<span class="sd">        Obs to transfer</span>
+<span class="sd">    regression</span>
+<span class="sd">        Whether training is regression</span>
+<span class="sd">    n_neighbors</span>
+<span class="sd">        Number of neighbors to use in training. More leads to more &#39;smeared&#39; predicted data</span>
+<span class="sd">    weights</span>
+<span class="sd">        Weight based on &#39;distance&#39; or &#39;uniform&#39;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`KnnPredict`</span>
+<span class="sd">        Trained kNN predictor object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ArgAssert</span><span class="p">(</span><span class="n">embedding_key</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;embedding_key not in adata.obsm&quot;</span><span class="p">)</span>
+    <span class="n">ArgAssert</span><span class="p">(</span><span class="n">obs_key</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;obs_key not in adata.obs&quot;</span><span class="p">)</span>
+
+    <span class="n">cat_dict</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">categorical</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">obs_key</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;category&quot;</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">obs_key</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">if</span> <span class="n">regression</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Regression is not supported with categorical obs values. Switching to classification...&quot;</span><span class="p">)</span>
+            <span class="n">regression</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">categorical</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">cat_dict</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">obs_key</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span>
+    <span class="k">elif</span> <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">obs_key</span><span class="p">]):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">obs_key</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The values stored in .obs[obs_key] are neither categorical nor numeric&#39;</span><span class="p">)</span>
+
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="n">_format_kwargs</span><span class="p">(</span>
+        <span class="p">{},</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;n_neighbors&#39;</span><span class="p">:</span> <span class="n">n_neighbors</span><span class="p">,</span>
+            <span class="s1">&#39;weights&#39;</span><span class="p">:</span> <span class="n">weights</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">KnnPredict</span><span class="p">(</span>
+        <span class="n">embedding_key</span><span class="p">,</span>
+        <span class="n">regression</span><span class="p">,</span>
+        <span class="n">knn_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="n">categorical</span><span class="o">=</span><span class="n">categorical</span><span class="p">,</span>
+        <span class="n">cat_dict</span><span class="o">=</span><span class="n">cat_dict</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">learn</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="train_on_matrix">
+<a class="viewcode-back" href="../../../sparscit.graph.html#sparscit.graph.train_on_matrix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_on_matrix</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">embedding_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">layer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">obsm_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">regression</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">n_neighbors</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="s1">&#39;distance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;distance&#39;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KnnPredict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transfer .layers or .obsm data using either kNN regression or classification.</span>
+<span class="sd">    One of layer or obsm_key has to be set</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        Adata with the layer to transfer</span>
+<span class="sd">    embedding_key</span>
+<span class="sd">        Embedding key of a shared embedding of learning and target Anndatas</span>
+<span class="sd">    layer</span>
+<span class="sd">        Layer to transfer</span>
+<span class="sd">    obsm_key</span>
+<span class="sd">        Embedding to transfer</span>
+<span class="sd">    regression</span>
+<span class="sd">        Whether training is regression</span>
+<span class="sd">    n_neighbors</span>
+<span class="sd">        Number of neighbors to use in training. More leads to more &#39;smeared&#39; predicted data</span>
+<span class="sd">    weights</span>
+<span class="sd">        Weight based on &#39;distance&#39; or &#39;uniform&#39;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`KnnPredict`</span>
+<span class="sd">        Trained kNN predictor object that can transfer layer or obsm data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ArgAssert</span><span class="p">(</span><span class="n">embedding_key</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;embedding_key not in adata.obsm&quot;</span><span class="p">)</span>
+    <span class="n">ArgAssert</span><span class="p">((</span><span class="n">obsm_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">layer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">),</span> <span class="s1">&#39;Either layer or obsm_key has to be None&#39;</span><span class="p">)</span>
+
+    <span class="n">use_layer</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">obsm_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ArgAssert</span><span class="p">(</span><span class="n">obsm_key</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;obsm_key not in adata.obsm&quot;</span><span class="p">)</span>
+        <span class="n">use_layer</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">elif</span> <span class="n">layer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ArgAssert</span><span class="p">(</span><span class="n">layer</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;layer not in adata.layers&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Both layer and obsm_key cannot be None&#39;</span><span class="p">)</span>
+
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="n">_format_kwargs</span><span class="p">(</span>
+        <span class="p">{},</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;n_neighbors&#39;</span><span class="p">:</span> <span class="n">n_neighbors</span><span class="p">,</span>
+            <span class="s1">&#39;weights&#39;</span><span class="p">:</span> <span class="n">weights</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">KnnPredict</span><span class="p">(</span>
+        <span class="n">embedding_key</span><span class="p">,</span>
+        <span class="n">regression</span><span class="p">,</span>
+        <span class="n">knn_kwargs</span><span class="o">=</span><span class="n">kwargs</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">learn</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">,</span>
+        <span class="n">adata</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> <span class="k">if</span> <span class="n">use_layer</span> <span class="k">else</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">obsm_key</span><span class="p">],</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,321 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sparscit.plotting._hist &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/icon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sparscit.plotting._hist</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sparscit.plotting._hist</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">._helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">MplWrap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArgAssert</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..tools._layers</span><span class="w"> </span><span class="kn">import</span> <span class="n">LayerConfig</span>
+
+<span class="n">_rt</span> <span class="o">=</span> <span class="s2">&quot;Please run toolkit.tl.add_metadata&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_lc</span><span class="p">(</span><span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">ArgAssert</span><span class="p">(</span>
+        <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;This anndata has no layers. Please fix this by using X_to_layer or stack_adata&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># def default_style() -&gt; None:</span>
+<span class="c1">#    import matplotlib.pyplot as plt</span>
+<span class="c1">#    plt.style.use(&quot;seaborn-v0_8-dark&quot;)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_histogram</span><span class="p">(</span>
+        <span class="n">_data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">log_yscale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="n">xlabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">label_exp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">xminmax</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">MplWrap</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="n">plw</span> <span class="o">=</span> <span class="n">MplWrap</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">plw</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">_data</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
+    <span class="n">plw</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plw</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">log_yscale</span><span class="p">:</span>
+        <span class="n">plw</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">xminmax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plw</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="n">xminmax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">right</span><span class="o">=</span><span class="n">xminmax</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">label_exp</span><span class="p">:</span>
+        <span class="n">xticks</span> <span class="o">=</span> <span class="n">plw</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xticks</span><span class="p">)):</span>
+            <span class="n">xticks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">_text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{0:.1f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">e</span> <span class="o">**</span> <span class="nb">float</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;−&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">xticks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">_text</span><span class="p">)))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">plw</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">xticks</span><span class="p">)</span>
+    <span class="n">plw</span><span class="o">.</span><span class="n">despine</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">plw</span><span class="p">,</span> <span class="n">b</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">degree_histogram</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">obsp_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">log_scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">xminmax</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">degree</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsp</span><span class="p">[</span><span class="n">obsp_key</span><span class="p">]</span><span class="o">.</span><span class="n">getnnz</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">_histogram</span><span class="p">(</span>
+        <span class="n">degree</span><span class="p">,</span>
+        <span class="n">log_scale</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s1">&#39;Distribution of cell neighbor-graph degree&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Degree&#39;</span><span class="p">,</span>
+        <span class="n">xminmax</span><span class="o">=</span><span class="n">xminmax</span>
+    <span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">_htype</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">,</span> <span class="s1">&#39;feature&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="counts_histogram">
+<a class="viewcode-back" href="../../../sparscit.plotting.html#sparscit.plotting.counts_histogram">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">counts_histogram</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">log_counts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">log_y_scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">hist_type</span><span class="p">:</span> <span class="n">_htype</span> <span class="o">=</span> <span class="s1">&#39;cell&#39;</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">label_exp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">xminmax</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot cell counts histogram in all layers, i.e. fragments/reads per cell.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">    log_y_scale</span>
+<span class="sd">        Whether y-axis should be log scale</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_check_lc</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hist_type</span> <span class="o">==</span> <span class="s1">&#39;cell&#39;</span><span class="p">:</span>
+        <span class="n">_obs</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span>
+    <span class="k">elif</span> <span class="n">hist_type</span> <span class="o">==</span> <span class="s1">&#39;feature&#39;</span><span class="p">:</span>
+        <span class="n">_obs</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">var</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_obs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span><span class="p">[</span><span class="o">-</span><span class="mi">12</span><span class="p">:]</span> <span class="o">!=</span> <span class="s1">&#39;total_counts&#39;</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">_histogram</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">_obs</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">if</span> <span class="n">log_counts</span> <span class="k">else</span> <span class="n">_obs</span><span class="p">[</span><span class="n">k</span><span class="p">],</span>
+            <span class="n">log_y_scale</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s1">&#39;Distribution of </span><span class="si">{</span><span class="n">hist_type</span><span class="si">}</span><span class="s1"> total counts (</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s1">&#39;ln1p(</span><span class="si">{</span><span class="n">hist_type</span><span class="si">}</span><span class="s1"> total counts)&#39;</span><span class="p">,</span>
+            <span class="n">label_exp</span><span class="o">=</span><span class="n">label_exp</span><span class="p">,</span>
+            <span class="n">xminmax</span><span class="o">=</span><span class="n">xminmax</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="layer_config_histogram">
+<a class="viewcode-back" href="../../../sparscit.plotting.html#sparscit.plotting.layer_config_histogram">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">layer_config_histogram</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">lc</span><span class="p">:</span> <span class="n">LayerConfig</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">total_counts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">after_binarization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">log_xscale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">log_scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">ignore_zeroes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">xminmax</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot the sparse matrix data (or total feature counts when total_counts=True) of a layer config</span>
+<span class="sd">    executed on given anndata. This function can be useful when deciding the threshold for active</span>
+<span class="sd">    signal, since it plots the frequency of signal data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">    lc</span>
+<span class="sd">        LayerConfig</span>
+<span class="sd">    threshold</span>
+<span class="sd">        If this is None, use threshold set in layer config</span>
+<span class="sd">    total_counts</span>
+<span class="sd">        If this is True, plot frequency of feature signal not matrix data signal</span>
+<span class="sd">    after_binarization</span>
+<span class="sd">        Whether to binarize the counts and use the result for histogram</span>
+<span class="sd">    log_xscale</span>
+<span class="sd">        Histogram y-axis scale</span>
+<span class="sd">    bins</span>
+<span class="sd">        Number of bins</span>
+<span class="sd">    xminmax</span>
+<span class="sd">        xlim for plot</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">histarg</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;xminmax&quot;</span><span class="p">:</span> <span class="n">xminmax</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">bins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">histarg</span><span class="p">[</span><span class="s2">&quot;bins&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bins</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">passing_info</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">_threshold</span><span class="p">,</span> <span class="n">total</span><span class="p">):</span>
+        <span class="n">passing</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span> <span class="o">&gt;</span> <span class="n">_threshold</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{0:.2f}</span><span class="s1">&#39;</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Passing entries (&gt; </span><span class="si">{</span><span class="n">_threshold</span><span class="si">}</span><span class="s2">): &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">passing</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">fs</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">passing</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">total</span><span class="p">)</span><span class="si">}</span><span class="s2">%)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">total_counts</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="n">ArgAssert</span><span class="p">(</span><span class="n">after_binarization</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;after_binarization cannot be True when total_counts is False&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">get_threshold</span><span class="p">()</span>
+
+        <span class="n">passing_info</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">nnz</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ignore_zeroes</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">plw</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_histogram</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">log_xscale</span> <span class="k">else</span> <span class="n">data</span><span class="p">,</span>
+            <span class="n">log_scale</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s1">&#39;Distribution of transformed </span><span class="si">{</span><span class="n">lc</span><span class="o">.</span><span class="n">layer</span><span class="si">}</span><span class="s1"> counts&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Transformed counts&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">histarg</span>
+        <span class="p">)</span>
+        <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">plw</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+        <span class="n">plw</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">after_binarization</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span>
+
+        <span class="k">if</span> <span class="n">ignore_zeroes</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">plw</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">_histogram</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">log_xscale</span> <span class="k">else</span> <span class="n">data</span><span class="p">,</span>
+            <span class="n">log_scale</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s1">&#39;Distribution of per-feature </span><span class="si">{</span><span class="n">lc</span><span class="o">.</span><span class="n">layer</span><span class="si">}</span><span class="s1"> counts</span><span class="si">{</span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">after_binarization</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot; (binarized)&quot;</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Transformed total counts&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">histarg</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">after_binarization</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">threshold</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">get_threshold</span><span class="p">()</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">data</span> <span class="o">&gt;</span> <span class="n">threshold</span>
+            <span class="n">msum</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span>
+            <span class="k">if</span> <span class="n">log_xscale</span><span class="p">:</span>
+                <span class="n">msum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">msum</span><span class="p">)</span>
+                <span class="n">msum</span><span class="p">[</span><span class="n">msum</span> <span class="o">==</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">plw</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">msum</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;after thresholding&#39;</span><span class="p">)</span>
+            <span class="n">plw</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plw</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

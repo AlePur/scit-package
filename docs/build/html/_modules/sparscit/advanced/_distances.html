@@ -1,0 +1,434 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sparscit.advanced._distances &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/icon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sparscit.advanced._distances</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sparscit.advanced._distances</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Literal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">MiniBatchKMeans</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_csr_mean</span><span class="p">,</span> <span class="n">ArgAssert</span><span class="p">,</span> <span class="n">_double_lambda</span><span class="p">,</span> <span class="n">_get_memberships</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..tools._layers</span><span class="w"> </span><span class="kn">import</span> <span class="n">LayerConfig</span><span class="p">,</span> <span class="n">_format_var_names</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._dbscan</span><span class="w"> </span><span class="kn">import</span> <span class="n">SubgraphDBSCAN</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._denoise</span><span class="w"> </span><span class="kn">import</span> <span class="n">denoise_inner</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">classify_denoised_defunct</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">layer_config</span><span class="p">:</span> <span class="n">LayerConfig</span><span class="p">,</span>
+        <span class="n">embedding_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">min_degree</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">min_active</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;top_layer&#39;</span><span class="p">,</span> <span class="s1">&#39;threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;threshold&#39;</span><span class="p">,</span>
+        <span class="n">rep_min_cells</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">exclude_below_rep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">obsp_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;distances&#39;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Classify active cell clusters.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">    LayerConfig</span>
+<span class="sd">        Result of denoised data</span>
+<span class="sd">    min_degree</span>
+<span class="sd">        Exclude points with degree less than min_degree</span>
+<span class="sd">    min_active</span>
+<span class="sd">        Exclude active clusters with less than min_active members</span>
+<span class="sd">    mode</span>
+<span class="sd">        Whether pick active cells based on relative replication level, or absolute replication threshold</span>
+<span class="sd">    obsp_key</span>
+<span class="sd">        Key for distances in obsp</span>
+<span class="sd">    subcluster_per_n_cells</span>
+<span class="sd">        Number of cell in each Kmeans subcluster</span>
+<span class="sd">    rep_min_cells</span>
+<span class="sd">        Minimum cells for accepting replication level in activity layer</span>
+<span class="sd">    exclude_below_rep</span>
+<span class="sd">        Exclude features below this replication level</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">layer_config</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">raw_view</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">datamax</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;top_layer&#39;</span><span class="p">:</span>
+        <span class="c1"># cells in each level</span>
+        <span class="n">levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([((</span><span class="n">data</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">l</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">A1</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">datamax</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">levels</span><span class="p">[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># first occurrence</span>
+        <span class="n">picked_level</span> <span class="o">=</span> <span class="n">datamax</span> <span class="o">-</span> <span class="p">(</span><span class="n">levels</span> <span class="o">&gt;=</span> <span class="n">rep_min_cells</span><span class="p">)</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># check max sum if above th</span>
+        <span class="n">layer_config</span><span class="o">.</span><span class="n">cached_mask</span> <span class="o">=</span> <span class="n">levels</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">rep_min_cells</span>
+        <span class="k">if</span> <span class="n">exclude_below_rep</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">layer_config</span><span class="o">.</span><span class="n">cached_mask</span> <span class="o">=</span> <span class="n">layer_config</span><span class="o">.</span><span class="n">cached_mask</span> <span class="o">*</span> <span class="p">(</span><span class="n">picked_level</span> <span class="o">&gt;=</span> <span class="n">exclude_below_rep</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">sps</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">layer_config</span><span class="o">.</span><span class="n">cached_mask</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">picked_level</span><span class="p">[</span><span class="n">layer_config</span><span class="o">.</span><span class="n">cached_mask</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">td</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">td</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">td</span><span class="o">.</span><span class="n">data</span> <span class="o">&gt;=</span> <span class="n">exclude_below_rep</span>
+        <span class="n">layer_config</span><span class="o">.</span><span class="n">cached_mask</span> <span class="o">=</span> <span class="n">td</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span> <span class="o">&gt;</span> <span class="n">rep_min_cells</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">sps</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">td</span><span class="p">[:,</span> <span class="n">layer_config</span><span class="o">.</span><span class="n">cached_mask</span><span class="p">])</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+    <span class="n">find</span> <span class="o">=</span> <span class="n">FindActive</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">layer_config</span><span class="p">,</span> <span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">save_prefix</span><span class="o">=</span><span class="s1">&#39;active_class_&#39;</span><span class="p">,</span> <span class="n">override_data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Running subclassification on </span><span class="si">{</span><span class="n">find</span><span class="o">.</span><span class="n">var_mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2"> &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;genes, excluding below degree of </span><span class="si">{</span><span class="n">min_degree</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">X_emb</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">embedding_key</span><span class="p">]</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsp</span><span class="p">[</span><span class="n">obsp_key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">_G</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_classify_subset</span><span class="p">(</span>
+            <span class="n">clusters</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">classifier_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">bind</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]],</span>
+            <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">full</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ignore</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sub_clusters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">adata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],),</span> <span class="n">full</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+        <span class="n">uq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ignore</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">uq</span> <span class="o">=</span> <span class="n">uq</span><span class="p">[</span><span class="n">uq</span> <span class="o">!=</span> <span class="n">ignore</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">uq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">_uq</span> <span class="ow">in</span> <span class="n">uq</span><span class="p">:</span>
+            <span class="n">ac</span> <span class="o">=</span> <span class="n">clusters</span> <span class="o">==</span> <span class="n">_uq</span>
+
+            <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bind</span><span class="p">:</span>
+                <span class="n">classifier_args</span><span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">](</span><span class="n">ac</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;DBSCAN&#39;</span><span class="p">:</span>
+                <span class="n">classifier</span> <span class="o">=</span> <span class="n">SubgraphDBSCAN</span><span class="p">(</span>
+                    <span class="o">**</span><span class="n">classifier_args</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ac</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">classifier</span> <span class="o">=</span> <span class="n">MiniBatchKMeans</span><span class="p">(</span>
+                    <span class="o">**</span><span class="n">classifier_args</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_emb</span><span class="p">[</span><span class="n">ac</span><span class="p">])</span>
+
+            <span class="n">sub_clusters</span><span class="p">[</span><span class="n">ac</span><span class="p">]</span> <span class="o">=</span> <span class="n">classifier</span><span class="o">.</span><span class="n">labels_</span> <span class="o">+</span> <span class="n">sub_clusters</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">sub_clusters</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_internal</span><span class="p">(</span>
+            <span class="n">_self</span><span class="p">:</span> <span class="n">FindActive</span><span class="p">,</span>
+            <span class="n">gene_index</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># x &gt; t_rna</span>
+        <span class="n">pass_th_x</span> <span class="o">=</span> <span class="n">_self</span><span class="o">.</span><span class="n">Z</span><span class="p">[:,</span> <span class="n">gene_index</span><span class="p">]</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span><span class="o">.</span><span class="n">A1</span>
+        <span class="k">if</span> <span class="n">pass_th_x</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="c1"># HDBSCAN(min_cluster_size=min_points)</span>
+            <span class="c1"># OPTICS(min_samples=min_points, cluster_method=&#39;dbscan&#39;, max_eps=1.0)</span>
+            <span class="n">active</span> <span class="o">=</span> <span class="n">_classify_subset</span><span class="p">(</span>
+                <span class="n">pass_th_x</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;min_samples&quot;</span><span class="p">:</span> <span class="n">min_degree</span><span class="p">,</span>
+                    <span class="s2">&quot;min_active&quot;</span><span class="p">:</span> <span class="n">min_active</span>
+                <span class="p">},</span>
+                <span class="p">[],</span>
+                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;DBSCAN&quot;</span><span class="p">,</span>
+                <span class="n">ignore</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="n">active_sub_clusters</span> <span class="o">=</span> <span class="n">_classify_subset</span><span class="p">(</span>
+                <span class="n">active</span><span class="p">,</span>
+                <span class="p">{},</span>
+                <span class="p">[(</span>
+                    <span class="s2">&quot;n_clusters&quot;</span><span class="p">,</span>
+                    <span class="k">lambda</span> <span class="n">ac</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">ac</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">subcluster_per_n_cells</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+                <span class="p">)],</span>
+                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;KMeans&quot;</span><span class="p">,</span>
+                <span class="n">ignore</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">active_sub_clusters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1">#if not (active_sub_clusters == -1).all():</span>
+                <span class="n">_self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">_self</span><span class="o">.</span><span class="n">genes_to_scan</span><span class="p">[</span><span class="n">gene_index</span><span class="p">]]</span> <span class="o">=</span> <span class="n">sps</span><span class="o">.</span><span class="n">csr_array</span><span class="p">(</span><span class="n">active_sub_clusters</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">_self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">_self</span><span class="o">.</span><span class="n">genes_to_scan</span><span class="p">[</span><span class="n">gene_index</span><span class="p">]]</span><span class="o">.</span><span class="n">eliminate_zeros</span><span class="p">()</span>
+
+    <span class="n">mla</span> <span class="o">=</span> <span class="n">find</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_internal</span><span class="p">)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">mla</span><span class="o">.</span><span class="n">future_key</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">mla</span><span class="o">.</span><span class="n">to_sps</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Added </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1"> to .obsm&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="classify_enrichment">
+<a class="viewcode-back" href="../../../sparscit.advanced.default.html#sparscit.advanced.classify_enrichment">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">classify_enrichment</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">,</span>
+        <span class="n">layer_config</span><span class="p">:</span> <span class="n">LayerConfig</span><span class="p">,</span>
+        <span class="n">enrich_a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">enrich_b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">enrich_g</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">q</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Classify features as enriched based on quantile-normalized thresholds.</span>
+
+<span class="sd">    A feature is classified as active when</span>
+<span class="sd">    ``(value - enrich_a) / (quantile^enrich_g - 1) &gt; enrich_b``, where the</span>
+<span class="sd">    quantile is computed per feature at level ``q``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        AnnData object to classify</span>
+<span class="sd">    layer_config</span>
+<span class="sd">        LayerConfig specifying which layer to transform</span>
+<span class="sd">    enrich_a</span>
+<span class="sd">        Additive offset for the enrichment threshold</span>
+<span class="sd">    enrich_b</span>
+<span class="sd">        Multiplicative threshold after normalisation</span>
+<span class="sd">    enrich_g</span>
+<span class="sd">        Exponent applied to the quantile base in the denominator</span>
+<span class="sd">    q</span>
+<span class="sd">        Quantile (0–1) used to compute the per-feature baseline</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># s &gt; a + b(mean)</span>
+    <span class="c1"># (s - a) / mean &gt; b</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">layer_config</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">use_cached_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
+    <span class="c1"># mean = X.mean(axis=0).A1</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">X</span><span class="p">),</span><span class="n">q</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    
+    <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">layer_config</span><span class="o">.</span><span class="n">layer</span><span class="si">}</span><span class="s1">_active&#39;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Added to .obsm[&quot;</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s1">&quot;]&#39;</span><span class="p">)</span>
+    <span class="c1">#R = X / enrich_a</span>
+    <span class="c1">#X = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))</span>
+    <span class="c1">#adata.obsm[s] = sps.csr_matrix((R + (X &gt; enrich_b)) &gt; 1)</span>
+    <span class="c1">#adata.obsm[s] = sps.csr_matrix(((X - enrich_a) @ sps.diags(1.0 / (np.sqrt(mean+1)-1))) &gt; enrich_b)</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">sps</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(((</span><span class="n">X</span> <span class="o">-</span> <span class="n">enrich_a</span><span class="p">)</span> <span class="o">@</span> <span class="n">sps</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">base</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">enrich_g</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="n">enrich_b</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="neighborhood_activities">
+<a class="viewcode-back" href="../../../sparscit.advanced.default.html#sparscit.advanced.neighborhood_activities">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">neighborhood_activities</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">layer_config</span><span class="p">:</span> <span class="n">LayerConfig</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">community_matrix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;leiden_matrix&#39;</span><span class="p">,</span>
+        <span class="n">use_cached_mask</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sps</span><span class="o">.</span><span class="n">csr_matrix</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute neighbourhood activity profiles from community memberships.</span>
+
+<span class="sd">    Aggregates binary activity per community using the community membership</span>
+<span class="sd">    matrix stored in ``adata.obsm``, then stores the result in</span>
+<span class="sd">    ``adata.obsm`` and feature names in ``adata.uns``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        AnnData object with community memberships in ``.obsm``</span>
+<span class="sd">    layer_config</span>
+<span class="sd">        LayerConfig specifying which layer to transform</span>
+<span class="sd">    community_matrix</span>
+<span class="sd">        Key in ``adata.obsm`` for the community membership matrix</span>
+<span class="sd">    use_cached_mask</span>
+<span class="sd">        Whether to use a previously cached feature mask</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Sparse matrix of neighbourhood activities (or ``None`` if stored in-place)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ArgAssert</span><span class="p">(</span><span class="n">community_matrix</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">community_matrix</span><span class="si">}</span><span class="s1"> not found in .obsm&#39;</span><span class="p">)</span>
+    <span class="n">communities</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">community_matrix</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+    
+    <span class="n">L</span><span class="p">,</span> <span class="n">B</span> <span class="o">=</span> <span class="n">list_of_arrays_to_csr_with_samples</span><span class="p">(</span><span class="n">communities</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">layer_config</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">use_cached_mask</span><span class="o">=</span><span class="n">use_cached_mask</span><span class="p">,</span> <span class="n">binarize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+    <span class="c1"># norm</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">sps</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">L</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span><span class="p">)</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;neighborhood_</span><span class="si">{</span><span class="n">layer_config</span><span class="o">.</span><span class="n">layer</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">sn</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;neighborhood_</span><span class="si">{</span><span class="n">layer_config</span><span class="o">.</span><span class="n">layer</span><span class="si">}</span><span class="s1">_names&#39;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Added to .obsm[&quot;</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s1">&quot;], .uns[&quot;</span><span class="si">{</span><span class="n">sn</span><span class="si">}</span><span class="s1">&quot;]&#39;</span><span class="p">)</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="n">sn</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer_config</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">(</span><span class="n">use_cached_mask</span><span class="o">=</span><span class="n">use_cached_mask</span><span class="p">)</span>
+    <span class="c1"># AC = (L @ D @ (L.T @ X))</span>
+    <span class="c1"># AC.data = (AC.data - AC.data.min()) / (AC.data.max() - AC.data.min())</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span> <span class="o">@</span> <span class="n">D</span> <span class="o">@</span> <span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">))</span> </div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">array_to_sparse_bool_matrix</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    AI GENERATED:</span>
+<span class="sd">    Convert 1D array of integers to sparse boolean matrix.</span>
+<span class="sd">    Assumes integers are 0, 1, 2, ..., m-1 where m is max(arr) + 1.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    arr : array-like, shape (n,)</span>
+<span class="sd">        Input array of integers starting from 0</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    sparse_matrix : scipy.sparse.csr_matrix, shape (n, m)</span>
+<span class="sd">        Sparse boolean matrix where m = max(arr) + 1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">row_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">col_indices</span> <span class="o">=</span> <span class="n">arr</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">sparse_matrix</span> <span class="o">=</span> <span class="n">sps</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">row_indices</span><span class="p">,</span> <span class="n">col_indices</span><span class="p">)),</span> 
+                                    <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sparse_matrix</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">list_of_arrays_to_csr_with_samples</span><span class="p">(</span><span class="n">list_of_arrays</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    AI GENERATED:</span>
+<span class="sd">    Convert list of arrays to horizontally stacked CSR matrix and a sample mapping matrix.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    list_of_arrays : list of array-like</span>
+<span class="sd">        List of l arrays, each of shape (n,), containing integer values</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    stacked_matrix : scipy.sparse.csr_matrix, shape (n, k)</span>
+<span class="sd">        Horizontally stacked sparse boolean matrix where k is the sum of unique </span>
+<span class="sd">        integers across all samples. Each row corresponds to one position in the arrays.</span>
+<span class="sd">    </span>
+<span class="sd">    sample_matrix : scipy.sparse.csr_matrix, shape (k, l)</span>
+<span class="sd">        Matrix indicating which sample (column) each feature (row) came from.</span>
+<span class="sd">        Each row has exactly one True value indicating its source sample.</span>
+<span class="sd">    </span>
+<span class="sd">    Example:</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; arr1 = np.array([0, 1, 2])  # 3 unique values (0,1,2)</span>
+<span class="sd">    &gt;&gt;&gt; arr2 = np.array([1, 2, 3])  # 3 unique values (1,2,3)</span>
+<span class="sd">    &gt;&gt;&gt; stacked, samples = list_of_arrays_to_csr_with_samples([arr1, arr2])</span>
+<span class="sd">    &gt;&gt;&gt; stacked.shape  # (3, 6) - n=3, 6 total unique values</span>
+<span class="sd">    &gt;&gt;&gt; samples.shape  # (6, 2) - 6 features, 2 samples</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_of_arrays</span><span class="p">)</span>  <span class="c1"># number of samples</span>
+
+    <span class="n">_a</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">sizes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">community</span> <span class="ow">in</span> <span class="n">list_of_arrays</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">array_to_sparse_bool_matrix</span><span class="p">(</span><span class="n">community</span><span class="p">)</span>
+        <span class="n">_a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="n">sizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">sps</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">_a</span><span class="p">)</span>
+
+    <span class="c1"># Create sample_matrix (k, l) using sizes</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sizes</span><span class="p">)</span>
+    <span class="n">row_indices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">col_indices</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">sample_idx</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sizes</span><span class="p">):</span>
+        <span class="n">row_indices</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">sizes</span><span class="p">[:</span><span class="n">sample_idx</span><span class="p">]),</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sizes</span><span class="p">[:</span><span class="n">sample_idx</span><span class="p">])</span> <span class="o">+</span> <span class="n">size</span><span class="p">))</span>
+        <span class="n">col_indices</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">sample_idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">size</span><span class="p">)</span>
+    
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row_indices</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">sample_matrix</span> <span class="o">=</span> <span class="n">sps</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">row_indices</span><span class="p">,</span> <span class="n">col_indices</span><span class="p">)),</span> 
+                                    <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">sample_matrix</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sizes</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">L</span><span class="p">,</span> <span class="n">sample_matrix</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

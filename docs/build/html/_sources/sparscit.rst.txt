@@ -1,0 +1,17 @@
+Modules
+=======
+
+.. toctree::
+   :maxdepth: 4
+
+   sparscit.load
+   sparscit.tools
+   sparscit.graph
+   sparscit.embedding
+   sparscit.plotting
+   sparscit.advanced
+
+.. automodule:: sparscit
+   :members:
+   :undoc-members:
+   :show-inheritance:

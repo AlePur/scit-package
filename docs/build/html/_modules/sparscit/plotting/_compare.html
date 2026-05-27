@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sparscit.plotting._compare &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/icon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sparscit.plotting._compare</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sparscit.plotting._compare</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.figure</span><span class="w"> </span><span class="kn">import</span> <span class="n">Figure</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.axes</span><span class="w"> </span><span class="kn">import</span> <span class="n">Axes</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">._helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColorUtil</span><span class="p">,</span> <span class="n">CategoricalColorUtil</span><span class="p">,</span> <span class="n">MplWrap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArgAssert</span><span class="p">,</span> <span class="n">_get_memberships</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._bar</span><span class="w"> </span><span class="kn">import</span> <span class="n">barplot</span><span class="p">,</span> <span class="n">CWheel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..tools._statistics</span><span class="w"> </span><span class="kn">import</span> <span class="n">Markers</span>
+
+
+<div class="viewcode-block" id="frequency_pie">
+<a class="viewcode-back" href="../../../sparscit.plotting.html#sparscit.plotting.frequency_pie">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">frequency_pie</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">labelmap</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">colors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">precomputed_freq</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">color_map</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">filter_min</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">show_frac</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">text_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">ax</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">Axes</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pie plot for frequencies of categorical data</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data</span>
+<span class="sd">        Integer array</span>
+<span class="sd">    labelmap</span>
+<span class="sd">        Dictionary mapping integers to labels</span>
+<span class="sd">    title</span>
+<span class="sd">        Title of plot</span>
+<span class="sd">    colors</span>
+<span class="sd">        Colors used on pie</span>
+<span class="sd">    precomputed_freq</span>
+<span class="sd">        If this is passed, data parameter is ignored</span>
+<span class="sd">    filter_min</span>
+<span class="sd">        Minimum number of frequency of categorical class for it to be visible</span>
+<span class="sd">    ax</span>
+<span class="sd">        Pass axes to plot on</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">precomputed_freq</span><span class="p">:</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="n">precomputed_freq</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">uq</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">uq</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">uq</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">labelmap</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">uq</span> <span class="o">=</span> <span class="p">[</span><span class="n">labelmap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">uq</span><span class="p">]</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">uq</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+
+    <span class="n">tot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">freq</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">ks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">freq</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="n">plw</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plw</span> <span class="o">=</span> <span class="n">MplWrap</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plw</span><span class="o">.</span><span class="n">ax</span>
+
+    <span class="n">lb</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">if</span> <span class="n">freq</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">filter_min</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">freq</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+    <span class="n">kw</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;colors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">colors</span>
+    <span class="k">if</span> <span class="n">color_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;colors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">color_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="s1">&#39;tab:gray&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lb</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">text_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;textprops&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="n">text_size</span><span class="p">}</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">pie</span><span class="p">(</span>
+        <span class="n">freq</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+        <span class="n">labels</span><span class="o">=</span><span class="n">lb</span><span class="p">,</span>
+        <span class="n">autopct</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%1.0f%%</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kw</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">title</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="top_markers">
+<a class="viewcode-back" href="../../../sparscit.plotting.html#sparscit.plotting.top_markers">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">top_markers</span><span class="p">(</span>
+        <span class="n">markers</span><span class="p">:</span> <span class="n">Markers</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot top markers</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    markers</span>
+<span class="sd">        :class:`Markers`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ArgAssert</span><span class="p">(</span><span class="n">markers</span><span class="o">.</span><span class="n">top_markers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Please run filter_top_markers first&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">markers</span><span class="o">.</span><span class="n">top_markers</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">barplot</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;nlog_p&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;pval&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">markers</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="p">(</span><span class="s1">&#39;tab:blue&#39;</span><span class="p">,</span> <span class="s1">&#39;tab:gray&#39;</span><span class="p">),</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">group</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Nothing to show&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="compare_categorical">
+<a class="viewcode-back" href="../../../sparscit.plotting.html#sparscit.plotting.compare_categorical">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compare_categorical</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">obs_base</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">obs_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">filter_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">Figure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compare categoricals using pie charts</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">    obs_base</span>
+<span class="sd">        Key to base comparison on</span>
+<span class="sd">    obs_key</span>
+<span class="sd">        Key to compare</span>
+<span class="sd">    filter_min</span>
+<span class="sd">        Clump together values with frequency less than filter_min</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ArgAssert</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">obs_base</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;category&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">obs_key</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;category&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;Both obs_key and obs_base have to be categorical&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">old_cats</span><span class="p">,</span> <span class="n">old_cat_names</span><span class="p">,</span> <span class="n">old_uq_cats</span> <span class="o">=</span> <span class="n">_get_memberships</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">obs_base</span><span class="p">)</span>
+    <span class="n">cats</span><span class="p">,</span> <span class="n">cat_names</span><span class="p">,</span> <span class="n">uq_cats</span> <span class="o">=</span> <span class="n">_get_memberships</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">obs_key</span><span class="p">)</span>
+
+    <span class="c1">#cu: CategoricalColorUtil = ColorUtil(adata, obs_key)</span>
+    <span class="c1">#col_map = cu.get_col_arr()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.constrained_layout.use&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">plw</span> <span class="o">=</span> <span class="n">MplWrap</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">bind_fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">dummy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">_shape</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">cat_names</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">axs</span> <span class="o">=</span> <span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">_shape</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span> <span class="o">/</span> <span class="mi">4</span><span class="p">),</span> <span class="n">a</span> <span class="o">%</span> <span class="mi">4</span><span class="p">))</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cat_names</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">uq_cats</span><span class="p">):</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">cats</span> <span class="o">==</span> <span class="n">l</span>
+        <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="p">[(</span><span class="n">old_cats</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">==</span> <span class="n">ol</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">for</span> <span class="n">ol</span> <span class="ow">in</span> <span class="n">old_uq_cats</span><span class="p">]</span>
+        <span class="n">freqd</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">old_cat_names</span><span class="p">,</span> <span class="n">freq</span><span class="p">))</span>
+        <span class="n">fmin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">filter_min</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+        <span class="n">frequency_pie</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]),</span> <span class="n">precomputed_freq</span><span class="o">=</span><span class="n">freqd</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="n">cat_names</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">filter_min</span><span class="o">=</span><span class="n">fmin</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,808 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced Tools (sparscit.adv) &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="_static/icon.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Advanced Plotting (sparscit.adv.pl)" href="sparscit.advanced.plotting.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="sparscit.advanced.html">Advanced (<code class="docutils literal notranslate"><span class="pre">sparscit.adv</span></code>)</a></li>
+      <li class="breadcrumb-item active">Advanced Tools (<code class="docutils literal notranslate"><span class="pre">sparscit.adv</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/sparscit.advanced.default.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="advanced-tools-sparscit-adv">
+<h1>Advanced Tools (<code class="docutils literal notranslate"><span class="pre">sparscit.adv</span></code>)<a class="headerlink" href="#advanced-tools-sparscit-adv" title="Link to this heading"></a></h1>
+<section id="landscape-grid">
+<h2>Landscape &amp; Grid<a class="headerlink" href="#landscape-grid" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._landscape_config.create_landscape_scaffold()</span></code> — Create a <code class="docutils literal notranslate"><span class="pre">LandscapeScaffold</span></code></p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._griddata.make_grid()</span></code> — Create a grid for landscape visualization</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._griddata.griddata_numerical()</span></code> — Interpolate numerical data onto a grid</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._griddata.griddata_categorical()</span></code> — Interpolate categorical data onto a grid</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._griddata.griddata_apply_transformations()</span></code> — Apply transformations to gridded data</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._grid.same_grid()</span></code> — Align two grids</p></li>
+</ul>
+</section>
+<section id="dynamics-hmms">
+<h2>Dynamics &amp; HMMs<a class="headerlink" href="#dynamics-hmms" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._dynamics.landscape_dynamics()</span></code> — Compute landscape dynamics over time</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._dynamics.griddata_correlations()</span></code> — Compute correlations on gridded data</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._dynamics.dynamics_add_expression_data()</span></code> — Add expression data to dynamics</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._pomegranate.create_hmm()</span></code> — Create a Hidden Markov Model</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._pomegranate.create_hmm_system()</span></code> — Create a multi-cell-type HMM system</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._pomegranate.fit_hmm()</span></code> — Fit an HMM to data</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._pomegranate.calculate_correlation()</span></code> — Calculate correlation in HMM context</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._hmm.get_probabilities()</span></code> — Get state probabilities from an HMM</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._hmm.predict_observations()</span></code> — Predict observations using an HMM</p></li>
+</ul>
+</section>
+<section id="community-enrichment">
+<h2>Community &amp; Enrichment<a class="headerlink" href="#community-enrichment" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._community.leiden_matrix()</span></code> — Leiden clustering returning membership matrix</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._community.random_neighborhood_matrix()</span></code> — Random neighborhood matrix</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._community.silhouette_score()</span></code> — Compute silhouette score</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._distances.classify_enrichment()</span></code> — Classify enrichment patterns</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._distances.neighborhood_activities()</span></code> — Compute neighborhood activity profiles</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._density.get_assortativity()</span></code> — Compute graph assortativity</p></li>
+</ul>
+</section>
+<section id="features-summaries">
+<h2>Features &amp; Summaries<a class="headerlink" href="#features-summaries" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._features.binary_active_feature()</span></code> — Compute binary active feature matrix</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._features.align_features()</span></code> — Align feature indices between two AnnData objects</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._features.dense_binary_activity_matrix()</span></code> — Create dense binary activity matrix</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._features.multi_color_copy()</span></code> — Create multi-color copies of data</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._features.feature_to_bed()</span></code> — Export features as BED format</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._summary.make_color_summary()</span></code> — Create a color summary</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._summary.cluster_summaries()</span></code> — Generate cluster-level summaries</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._summary.cocluster_summaries()</span></code> — Generate co-cluster summaries</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">sparscit.advanced._entropy.shannon_entropy()</span></code> — Compute Shannon entropy</p></li>
+</ul>
+</section>
+<section id="utilities">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="#sparscit.advanced.ImageToolsCV2" title="sparscit.advanced._cv2.ImageToolsCV2"><code class="xref py py-class docutils literal notranslate"><span class="pre">sparscit.advanced._cv2.ImageToolsCV2</span></code></a> — OpenCV-based image processing utilities</p></li>
+</ul>
+<dl class="py class" id="module-sparscit.advanced">
+<dt class="sig sig-object py" id="sparscit.advanced.ImageToolsCV2">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">ImageToolsCV2</span></span><a class="reference internal" href="_modules/sparscit/advanced/_cv2.html#ImageToolsCV2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.ImageToolsCV2" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Utility class for image processing operations using OpenCV.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="sparscit.advanced.ImageToolsCV2.crop_white">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">crop_white</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">245</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sparscit/advanced/_cv2.html#ImageToolsCV2.crop_white"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.ImageToolsCV2.crop_white" title="Link to this definition"></a></dt>
+<dd><p>Crop white parts of an image, keeping only the non-white content with optional padding.</p>
+<p>Parameters:
+image_path (str): Path to the input image
+threshold (int): Pixel values above this are considered white (0-255)
+padding (int): Additional padding around the cropped area</p>
+<p>Returns:
+numpy.ndarray: Cropped image</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sparscit.advanced.ImageToolsCV2.fig_to_img">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fig_to_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sparscit/advanced/_cv2.html#ImageToolsCV2.fig_to_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.ImageToolsCV2.fig_to_img" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sparscit.advanced.ImageToolsCV2.join_figures">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">join_figures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'horizontal'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sparscit/advanced/_cv2.html#ImageToolsCV2.join_figures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.ImageToolsCV2.join_figures" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sparscit.advanced.ImageToolsCV2.overlay_images">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">overlay_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">background</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sparscit/advanced/_cv2.html#ImageToolsCV2.overlay_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.ImageToolsCV2.overlay_images" title="Link to this definition"></a></dt>
+<dd><p>Place ‘overlay’ on ‘background’ at ‘position’ with transparency ‘alpha’</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.align_features">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">align_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bin_adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gene_adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gene_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_features.html#align_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.align_features" title="Link to this definition"></a></dt>
+<dd><p>Align feature indices in two datas.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bin_adata</strong></p></li>
+<li><p><strong>gene_adata</strong></p></li>
+<li><p><strong>bin_features</strong></p></li>
+<li><p><strong>gene_features</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>bin_adata.uns[‘aligned_features’], gene_adata.uns[‘aligned_features’]</em> – Dict of keys ‘names’, ‘bin_indices’, ‘gene_indices’</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.binary_active_feature">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">binary_active_feature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LayerConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'bin'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'gene'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_features.html#binary_active_feature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.binary_active_feature" title="Link to this definition"></a></dt>
+<dd><p>Return a boolean mask of features that are active in at least one cell.</p>
+<p>A feature is considered active if the binarized layer sum across cells
+exceeds <code class="docutils literal notranslate"><span class="pre">threshold</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData object</p></li>
+<li><p><strong>layer</strong> – LayerConfig specifying which layer to transform</p></li>
+<li><p><strong>threshold</strong> – Minimum number of active cells for a feature to be considered active</p></li>
+<li><p><strong>alignment_type</strong> – If set, restrict the mask to features aligned under the given type
+(<code class="docutils literal notranslate"><span class="pre">'bin'</span></code> or <code class="docutils literal notranslate"><span class="pre">'gene'</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Boolean array indicating which features are active</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.calculate_correlation">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">calculate_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hmm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HMMWrapper</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HMMListWrapper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_data_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconstructed_data_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">spearman</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_pomegranate.html#calculate_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.calculate_correlation" title="Link to this definition"></a></dt>
+<dd><p>Calculate correlation between original and reconstructed data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hmm</strong> – Fitted HMM model (single or list wrapper)</p></li>
+<li><p><strong>data</strong> – HMMData object with reconstructed data stored in supplementary</p></li>
+<li><p><strong>data_layers</strong> – List of layer names</p></li>
+<li><p><strong>original_data_name</strong> – Name of the original data layer to correlate against</p></li>
+<li><p><strong>reconstructed_data_name</strong> – Name of the reconstructed data in supplementary storage</p></li>
+<li><p><strong>spearman</strong> – Use Spearman correlation (Pearson not yet implemented)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Array of correlation values</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.classify_enrichment">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">classify_enrichment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LayerConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enrich_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enrich_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enrich_g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sparscit/advanced/_distances.html#classify_enrichment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.classify_enrichment" title="Link to this definition"></a></dt>
+<dd><p>Classify features as enriched based on quantile-normalized thresholds.</p>
+<p>A feature is classified as active when
+<code class="docutils literal notranslate"><span class="pre">(value</span> <span class="pre">-</span> <span class="pre">enrich_a)</span> <span class="pre">/</span> <span class="pre">(quantile^enrich_g</span> <span class="pre">-</span> <span class="pre">1)</span> <span class="pre">&gt;</span> <span class="pre">enrich_b</span></code>, where the
+quantile is computed per feature at level <code class="docutils literal notranslate"><span class="pre">q</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData object to classify</p></li>
+<li><p><strong>layer_config</strong> – LayerConfig specifying which layer to transform</p></li>
+<li><p><strong>enrich_a</strong> – Additive offset for the enrichment threshold</p></li>
+<li><p><strong>enrich_b</strong> – Multiplicative threshold after normalisation</p></li>
+<li><p><strong>enrich_g</strong> – Exponent applied to the quantile base in the denominator</p></li>
+<li><p><strong>q</strong> – Quantile (0–1) used to compute the per-feature baseline</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.cluster_summaries">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">cluster_summaries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">csr_matrix</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_clusters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_summary.html#cluster_summaries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.cluster_summaries" title="Link to this definition"></a></dt>
+<dd><p>Cluster features based on their summary profiles across modalities.</p>
+<p>Reduces each modality’s feature-by-category matrix with PCA, then
+applies KMeans to obtain cluster assignments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Nested dict of {modality: {category: sparse_matrix}} summaries</p></li>
+<li><p><strong>n_clusters</strong> – Number of KMeans clusters</p></li>
+<li><p><strong>log_transform</strong> – Apply <code class="docutils literal notranslate"><span class="pre">log1p(100</span> <span class="pre">*</span> <span class="pre">x)</span></code> before PCA</p></li>
+<li><p><strong>n_components</strong> – Number of PCA components used as KMeans input</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Array of cluster labels for each feature</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.cocluster_summaries">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">cocluster_summaries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">csr_matrix</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modality</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_summary.html#cocluster_summaries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.cocluster_summaries" title="Link to this definition"></a></dt>
+<dd><p>Co-cluster features using spectral biclustering on summary data.</p>
+<p>Applies spectral biclustering to the feature-by-category matrix of a
+single modality and returns reordered cluster labels for features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Nested dict of {modality: {category: sparse_matrix}} summaries</p></li>
+<li><p><strong>modality</strong> – Which modality key to use from <code class="docutils literal notranslate"><span class="pre">data</span></code></p></li>
+<li><p><strong>log_transform</strong> – Apply <code class="docutils literal notranslate"><span class="pre">log1p(100</span> <span class="pre">*</span> <span class="pre">x)</span></code> before clustering</p></li>
+<li><p><strong>n_components</strong> – Number of biclusters (must match number of categories)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Array of cluster labels for each feature</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.create_hmm">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">create_hmm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hmm_scheme</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'gamma'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'exponential'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hmm_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'unnamed'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">inertia</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stop_tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pomegranate_densehmm_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">HMMWrapper</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_pomegranate.html#create_hmm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.create_hmm" title="Link to this definition"></a></dt>
+<dd><p>Create a single Hidden Markov Model using pomegranate.</p>
+<p>Builds a DenseHMM with the specified number of states and emission
+distributions.  Distributions can be independent (one per modality)
+or joint, depending on whether all entries in <code class="docutils literal notranslate"><span class="pre">hmm_scheme</span></code> are
+identical.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_states</strong> – Number of hidden states</p></li>
+<li><p><strong>hmm_scheme</strong> – List of distribution names (<code class="docutils literal notranslate"><span class="pre">'gamma'</span></code> or <code class="docutils literal notranslate"><span class="pre">'exponential'</span></code>)
+per modality</p></li>
+<li><p><strong>hmm_name</strong> – Name identifier for the model</p></li>
+<li><p><strong>inertia</strong> – Inertia parameter for training</p></li>
+<li><p><strong>early_stop_tol</strong> – Early-stopping tolerance</p></li>
+<li><p><strong>pomegranate_densehmm_kwargs</strong> – Extra keyword arguments forwarded to <code class="docutils literal notranslate"><span class="pre">pomegranate.hmm.DenseHMM</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An <code class="xref py py-class docutils literal notranslate"><span class="pre">HMMWrapper</span></code> around the created model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.create_hmm_system">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">create_hmm_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hmm_scheme</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'gamma'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'exponential'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type_scheme</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hmm_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">inertia</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stop_tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pomegranate_densehmm_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">HMMListWrapper</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_pomegranate.html#create_hmm_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.create_hmm_system" title="Link to this definition"></a></dt>
+<dd><p>Create a system of HMMs, one per cell-type scheme entry.</p>
+<p>Each HMM in the system shares the same <code class="docutils literal notranslate"><span class="pre">n_states</span></code> and <code class="docutils literal notranslate"><span class="pre">hmm_scheme</span></code>
+but is trained on a different subset of cell types defined by
+<code class="docutils literal notranslate"><span class="pre">cell_type_scheme</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_states</strong> – Number of hidden states per HMM</p></li>
+<li><p><strong>hmm_scheme</strong> – List of distribution names (<code class="docutils literal notranslate"><span class="pre">'gamma'</span></code> or <code class="docutils literal notranslate"><span class="pre">'exponential'</span></code>)
+per modality</p></li>
+<li><p><strong>cell_type_scheme</strong> – List of tuples; each tuple specifies which cell-type indices
+the corresponding HMM covers</p></li>
+<li><p><strong>hmm_name</strong> – Name identifier for the HMM system</p></li>
+<li><p><strong>inertia</strong> – Inertia parameter passed to pomegranate’s DenseHMM</p></li>
+<li><p><strong>early_stop_tol</strong> – Early-stopping tolerance for training</p></li>
+<li><p><strong>pomegranate_densehmm_kwargs</strong> – Extra keyword arguments forwarded to <code class="docutils literal notranslate"><span class="pre">pomegranate.hmm.DenseHMM</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An <code class="xref py py-class docutils literal notranslate"><span class="pre">HMMListWrapper</span></code> containing one HMM per scheme entry</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.create_landscape_scaffold">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">create_landscape_scaffold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">LandscapeScaffold</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_landscape_config.html#create_landscape_scaffold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.create_landscape_scaffold" title="Link to this definition"></a></dt>
+<dd><p>Get scaffold for creating landscape based on dendrogram-based order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>adata</strong> – AnnData (presumably subset) to use for creating scaffold</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">LandscapeScaffold</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.dense_binary_activity_matrix">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">dense_binary_activity_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LayerConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_features.html#dense_binary_activity_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.dense_binary_activity_matrix" title="Link to this definition"></a></dt>
+<dd><p>Extract a dense boolean matrix of activity for selected features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData object</p></li>
+<li><p><strong>layer</strong> – LayerConfig specifying which layer to transform</p></li>
+<li><p><strong>mask</strong> – Boolean feature mask selecting which columns to keep</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Dense boolean array of shape (n_cells, n_selected_features)</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.dynamics_add_expression_data">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">dynamics_add_expression_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dyn_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activity_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_dynamics.html#dynamics_add_expression_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.dynamics_add_expression_data" title="Link to this definition"></a></dt>
+<dd><p>Annotate a dynamics DataFrame with expression values from an activity matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dyn_df</strong> – Dynamics DataFrame with <code class="docutils literal notranslate"><span class="pre">group</span></code> and <code class="docutils literal notranslate"><span class="pre">var_name</span></code> columns</p></li>
+<li><p><strong>feature_names</strong> – Array of feature names matching the rows of <code class="docutils literal notranslate"><span class="pre">activity_matrix</span></code></p></li>
+<li><p><strong>activity_matrix</strong> – Dense matrix of shape (n_features, n_groups) with expression values</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Annotated Polars DataFrame with an added <code class="docutils literal notranslate"><span class="pre">exp</span></code> column</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.feature_to_bed">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">feature_to_bed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sparscit/advanced/_features.html#feature_to_bed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.feature_to_bed" title="Link to this definition"></a></dt>
+<dd><p>Write selected features to a BED file.</p>
+<p>Features are expected in <code class="docutils literal notranslate"><span class="pre">chr:start-end</span></code> format and are split on
+<code class="docutils literal notranslate"><span class="pre">:</span></code> and <code class="docutils literal notranslate"><span class="pre">-</span></code> to produce the three required BED columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> – Output BED file path</p></li>
+<li><p><strong>features</strong> – Array of feature strings in <code class="docutils literal notranslate"><span class="pre">chr:start-end</span></code> format</p></li>
+<li><p><strong>mask</strong> – Boolean mask selecting which features to write</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.fit_hmm">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">fit_hmm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hmm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HMMWrapper</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HMMListWrapper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_sample_start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_sample_end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrain_global</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sparscit/advanced/_pomegranate.html#fit_hmm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.fit_hmm" title="Link to this definition"></a></dt>
+<dd><p>Fit an HMM (or HMM system) on the given data layers.</p>
+<p>When an <code class="xref py py-class docutils literal notranslate"><span class="pre">HMMListWrapper</span></code> is passed, each sub-model is trained
+on its corresponding cell-type scheme.  If <code class="docutils literal notranslate"><span class="pre">pretrain_global</span></code> is
+<code class="docutils literal notranslate"><span class="pre">True</span></code>, a global model is trained first and its parameters are
+used to initialise every sub-model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hmm</strong> – A single <code class="xref py py-class docutils literal notranslate"><span class="pre">HMMWrapper</span></code> or an <code class="xref py py-class docutils literal notranslate"><span class="pre">HMMListWrapper</span></code></p></li>
+<li><p><strong>data</strong> – HMMData object containing the training observations</p></li>
+<li><p><strong>data_layers</strong> – Layer names to use as input features</p></li>
+<li><p><strong>shuffled</strong> – Whether to shuffle the data before training</p></li>
+<li><p><strong>data_sample_start</strong> – Start index for data sub-sampling</p></li>
+<li><p><strong>data_sample_end</strong> – End index for data sub-sampling (<code class="docutils literal notranslate"><span class="pre">-1</span></code> = all)</p></li>
+<li><p><strong>pretrain_global</strong> – Pre-train a global model and copy its weights to all sub-models
+(only applicable when <code class="docutils literal notranslate"><span class="pre">hmm</span></code> is an <code class="xref py py-class docutils literal notranslate"><span class="pre">HMMListWrapper</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.get_assortativity">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">get_assortativity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LayerConfig</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">distances_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'distances'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_density.html#get_assortativity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.get_assortativity" title="Link to this definition"></a></dt>
+<dd><p>Calculate assortativity for all var in Anndata</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong></p></li>
+<li><p><strong>layer</strong> – <code class="xref py py-class docutils literal notranslate"><span class="pre">LayerConfig</span></code> with treshold set</p></li>
+<li><p><strong>distances_key</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>adata.var[‘assortativity’]</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.get_probabilities">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">get_probabilities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hmm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HMMWrapper</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HMMListWrapper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheme</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sparscit/advanced/_hmm.html#get_probabilities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.get_probabilities" title="Link to this definition"></a></dt>
+<dd><p>Compute state probabilities for each observation using a fitted HMM.</p>
+<p>Runs the HMM forward algorithm on the specified data layers and stores
+the resulting probability arrays in the data’s supplementary storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hmm</strong> – Fitted HMM model (single or list wrapper)</p></li>
+<li><p><strong>data</strong> – HMMData object containing the observation data</p></li>
+<li><p><strong>data_layers</strong> – List of layer names to use as input</p></li>
+<li><p><strong>scheme</strong> – Cell-type scheme mapping for list wrappers</p></li>
+<li><p><strong>data_name</strong> – Key under which to store the computed probabilities</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.griddata_apply_transformations">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">griddata_apply_transformations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddata_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gauss_kernel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median_filter_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(3,</span> <span class="pre">3)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_median_passes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upscale_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_scalar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_up</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_feature_q_norm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_range_q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">winsor_qs_low</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">winsor_qs_high</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">winsor_q_is_p_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">winsor_set_low_zero</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_fill</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_griddata.html#griddata_apply_transformations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.griddata_apply_transformations" title="Link to this definition"></a></dt>
+<dd><p>Apply a pipeline of transformations to numerical grid data in-place.</p>
+<p>Supports upscaling, Gaussian smoothing, median filtering, quantile
+normalisation, and Winsorisation.  The grid data stored in
+<code class="docutils literal notranslate"><span class="pre">adata.uns['griddata'][griddata_key]</span></code> is modified in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData with grid data in <code class="docutils literal notranslate"><span class="pre">.uns['griddata']</span></code></p></li>
+<li><p><strong>griddata_key</strong> – Key identifying which grid data to transform</p></li>
+<li><p><strong>gauss_kernel</strong> – Sigma values for Gaussian kernel; <code class="docutils literal notranslate"><span class="pre">None</span></code> skips Gaussian smoothing</p></li>
+<li><p><strong>median_filter_size</strong> – Size of the median filter kernel; <code class="docutils literal notranslate"><span class="pre">None</span></code> skips median filtering</p></li>
+<li><p><strong>n_median_passes</strong> – Number of times to apply the median filter</p></li>
+<li><p><strong>upscale_factor</strong> – Integer factor by which to upscale the grid resolution</p></li>
+<li><p><strong>data_scalar</strong> – Scalar multiplier applied to the data before transformations</p></li>
+<li><p><strong>max_up</strong> – Maximum allowed upscale factor (safety guard)</p></li>
+<li><p><strong>all_feature_q_norm</strong> – If set, normalise each grid position across all features at this
+quantile</p></li>
+<li><p><strong>data_range_q</strong> – Quantile used for range normalisation (1.0 = max)</p></li>
+<li><p><strong>winsor_qs_low</strong> – Lower quantile for Winsorisation; <code class="docutils literal notranslate"><span class="pre">None</span></code> to skip</p></li>
+<li><p><strong>winsor_qs_high</strong> – Upper quantile for Winsorisation; <code class="docutils literal notranslate"><span class="pre">None</span></code> to skip</p></li>
+<li><p><strong>winsor_q_is_p_max</strong> – Treat the upper Winsor quantile as a fraction of the max value</p></li>
+<li><p><strong>winsor_set_low_zero</strong> – Set Winsorised low values to zero instead of clipping</p></li>
+<li><p><strong>nan_fill</strong> – Value used to fill NaN entries</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.griddata_categorical">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">griddata_categorical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_cells</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sparscit/advanced/_griddata.html#griddata_categorical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.griddata_categorical" title="Link to this definition"></a></dt>
+<dd><p>Make <code class="xref py py-class docutils literal notranslate"><span class="pre">Griddata</span></code> from numerical feature of adata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong></p></li>
+<li><p><strong>obs_key</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Griddata</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.griddata_correlations">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">griddata_correlations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adatas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">AnnData</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddata_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_zeros</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spearman</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_weighting</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_raw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_dynamics.html#griddata_correlations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.griddata_correlations" title="Link to this definition"></a></dt>
+<dd><p>Compute per-feature correlations between two gridded landscapes.</p>
+<p>For each pair of AnnData objects, extracts the grid data identified by
+<code class="docutils literal notranslate"><span class="pre">griddata_keys</span></code>, aligns on the shared feature set, and computes
+correlations across grid positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adatas</strong> – List of two AnnData objects, each with grid data in <code class="docutils literal notranslate"><span class="pre">.uns['griddata']</span></code></p></li>
+<li><p><strong>griddata_keys</strong> – Keys into <code class="docutils literal notranslate"><span class="pre">.uns['griddata']</span></code> for each AnnData</p></li>
+<li><p><strong>features</strong> – Subset of features to correlate</p></li>
+<li><p><strong>ignore_zeros</strong> – Zero out pairs where either value is zero before correlating</p></li>
+<li><p><strong>spearman</strong> – Use Spearman correlation instead of Pearson</p></li>
+<li><p><strong>signal_weighting</strong> – Weight correlations by signal magnitude</p></li>
+<li><p><strong>return_raw</strong> – Return raw covariance/std components (requires <code class="docutils literal notranslate"><span class="pre">signal_weighting</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Polars DataFrame with correlation results and feature names</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.griddata_numerical">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">griddata_numerical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LayerConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_cells</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cached_mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sparscit/advanced/_griddata.html#griddata_numerical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.griddata_numerical" title="Link to this definition"></a></dt>
+<dd><p>Make <code class="xref py py-class docutils literal notranslate"><span class="pre">Griddata</span></code> from numerical feature of adata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs_key</strong> – Key for numerical in .obs</p></li>
+<li><p><strong>gauss_kernel</strong> – If this is a tuple of integers, use gaussian blur for smoothing.
+This is the sigma (standard deviation) parameter of the gaussian kernel</p></li>
+<li><p><strong>nan_fill</strong> – Replace nan with this value</p></li>
+<li><p><strong>min_cells</strong> – Min cells to create a pixel</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Griddata</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.landscape_dynamics">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">landscape_dynamics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddata_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_gd_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">fdc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spearman</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_dynamics.html#landscape_dynamics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.landscape_dynamics" title="Link to this definition"></a></dt>
+<dd><p>Compute per-feature dynamics correlations on a landscape grid.</p>
+<p>For each category in the categorical grid data, correlates the
+numerical grid values with the grid’s time axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData with grid data stored in <code class="docutils literal notranslate"><span class="pre">.uns['griddata']</span></code></p></li>
+<li><p><strong>griddata_key</strong> – Key for the numerical grid data</p></li>
+<li><p><strong>categorical_gd_key</strong> – Key for the categorical grid data defining regions</p></li>
+<li><p><strong>fdc</strong> – Whether to apply FDR correction (currently unused)</p></li>
+<li><p><strong>spearman</strong> – Use Spearman correlation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Polars DataFrame with columns <code class="docutils literal notranslate"><span class="pre">group</span></code>, <code class="docutils literal notranslate"><span class="pre">res</span></code>, and <code class="docutils literal notranslate"><span class="pre">var_name</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.leiden_matrix">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">leiden_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">obsp_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_community.html#leiden_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.leiden_matrix" title="Link to this definition"></a></dt>
+<dd><p>Create a matrix of leiden memberships.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData</p></li>
+<li><p><strong>g</strong> – Neighbor-graph</p></li>
+<li><p><strong>resolution</strong> – Resolution parameter for leiden</p></li>
+<li><p><strong>sample_n</strong> – Number of independent leiden algorithms to run</p></li>
+<li><p><strong>beta</strong> – Beta parameter for leiden</p></li>
+<li><p><strong>random_seed</strong> – Initial random seed. Will be incremented by 1 each time new leiden algorithm is run</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>adata.obsm[‘leiden_matrix’]</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.make_color_summary">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">make_color_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_cells_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddata_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_cells_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_summary.html#make_color_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.make_color_summary" title="Link to this definition"></a></dt>
+<dd><p>Plot summary bar for categorical (mostly cell type)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs_key</strong> – Key for categorical in .obs</p></li>
+<li><p><strong>min_cells_x</strong> – If not 0, trim grid on both ends to remove areas of low cell density</p></li>
+<li><p><strong>y_fraction</strong> – Float in range (0 - 1] for how much of the landscape to consider for summary. Smaller number means only cells in leaf clusters are used for summary</p></li>
+<li><p><strong>cutoff</strong> – Minimum distance to a real datapoint for a grid-datapoint to be considered. Zero (default) means infinite distance</p></li>
+<li><p><strong>make_plot</strong> – If this is False, skip plotting</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><cite>adata.uns[‘summary’]</cite> – Summary image data</p></li>
+<li><p><cite>adata.uns[‘grid’]</cite> – Trimmed grid if trim_grid = True</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.make_grid">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">make_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(300,</span> <span class="pre">300)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_griddata.html#make_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.make_grid" title="Link to this definition"></a></dt>
+<dd><p>Makes a grid based on <cite>.obsm[‘X_landscape’]</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>resolution</strong> – Tuple of integers specifying the resolution of grid</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>adata.uns[‘grid’]</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.multi_color_copy">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">multi_color_copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">LayerConfig</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{0:</span> <span class="pre">'#fff',</span> <span class="pre">1:</span> <span class="pre">'#485fd8',</span> <span class="pre">10:</span> <span class="pre">'tab:red',</span> <span class="pre">11:</span> <span class="pre">'#c3b812'}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_features.html#multi_color_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.multi_color_copy" title="Link to this definition"></a></dt>
+<dd><p>Combine multiple binary layers into a single categorical observation.</p>
+<p>Each layer contributes a digit in a base-10 encoding; the resulting
+categories are stored in <code class="docutils literal notranslate"><span class="pre">adata.obs['copied_data']</span></code> and the colour
+mapping in <code class="docutils literal notranslate"><span class="pre">adata.uns['colors_dict']</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData object to annotate</p></li>
+<li><p><strong>layers</strong> – List of LayerConfigs to combine</p></li>
+<li><p><strong>colors</strong> – Mapping from encoded category value to colour string</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Boolean mask of cells with non-zero combined activity</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.neighborhood_activities">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">neighborhood_activities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LayerConfig</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">community_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'leiden_matrix'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cached_mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">csr_matrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_distances.html#neighborhood_activities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.neighborhood_activities" title="Link to this definition"></a></dt>
+<dd><p>Compute neighbourhood activity profiles from community memberships.</p>
+<p>Aggregates binary activity per community using the community membership
+matrix stored in <code class="docutils literal notranslate"><span class="pre">adata.obsm</span></code>, then stores the result in
+<code class="docutils literal notranslate"><span class="pre">adata.obsm</span></code> and feature names in <code class="docutils literal notranslate"><span class="pre">adata.uns</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData object with community memberships in <code class="docutils literal notranslate"><span class="pre">.obsm</span></code></p></li>
+<li><p><strong>layer_config</strong> – LayerConfig specifying which layer to transform</p></li>
+<li><p><strong>community_matrix</strong> – Key in <code class="docutils literal notranslate"><span class="pre">adata.obsm</span></code> for the community membership matrix</p></li>
+<li><p><strong>use_cached_mask</strong> – Whether to use a previously cached feature mask</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sparse matrix of neighbourhood activities (or <code class="docutils literal notranslate"><span class="pre">None</span></code> if stored in-place)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.predict_observations">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">predict_observations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hmm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HMMWrapper</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HMMListWrapper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">predict_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sparscit/advanced/_hmm.html#predict_observations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.predict_observations" title="Link to this definition"></a></dt>
+<dd><p>Reconstruct observations from HMM state probabilities.</p>
+<p>Uses the stored probabilities to compute expected (or variance) values
+per observation and stores the result in the data’s supplementary
+storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hmm</strong> – Fitted HMM model (single or list wrapper)</p></li>
+<li><p><strong>data</strong> – HMMData object with probabilities already computed</p></li>
+<li><p><strong>y_pred_name</strong> – Key for the probability array in <code class="docutils literal notranslate"><span class="pre">data.supp</span></code></p></li>
+<li><p><strong>data_name</strong> – Key under which to store the reconstructed data</p></li>
+<li><p><strong>predict_var</strong> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, predict variance instead of expected value</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.random_neighborhood_matrix">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">random_neighborhood_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_clusters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">obsp_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'connectivities'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_community.html#random_neighborhood_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.random_neighborhood_matrix" title="Link to this definition"></a></dt>
+<dd><p>Generate random neighbourhood partitions and store as a matrix in <code class="docutils literal notranslate"><span class="pre">adata.obsm</span></code>.</p>
+<p>Repeatedly calls <code class="xref py py-func docutils literal notranslate"><span class="pre">random_neighborhood()</span></code> to produce <code class="docutils literal notranslate"><span class="pre">sample_n</span></code>
+random partitions and stacks them into a matrix stored under
+<code class="docutils literal notranslate"><span class="pre">adata.obsm['random_matrix']</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData with a connectivity graph in <code class="docutils literal notranslate"><span class="pre">.obsp[obsp_key]</span></code></p></li>
+<li><p><strong>n_clusters</strong> – Number of clusters per sample, or a list of cluster counts
+(one per sample)</p></li>
+<li><p><strong>sample_n</strong> – Number of random partitions to generate</p></li>
+<li><p><strong>obsp_key</strong> – Key in <code class="docutils literal notranslate"><span class="pre">adata.obsp</span></code> for the connectivity matrix</p></li>
+<li><p><strong>random_seed</strong> – Starting random seed (incremented per sample)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.same_grid">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">same_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adatas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">AnnData</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sparscit/advanced/_grid.html#same_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.same_grid" title="Link to this definition"></a></dt>
+<dd><p>Copy grid from first anndata to other anndatas</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.shannon_entropy">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">shannon_entropy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LayerConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_obs_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">celltype_obs_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_entropy.html#shannon_entropy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.shannon_entropy" title="Link to this definition"></a></dt>
+<dd><p>Compute Shannon entropy of feature activity across cell types within each class.</p>
+<p>For each class in <code class="docutils literal notranslate"><span class="pre">class_obs_key</span></code>, calculates the entropy of the
+per-cell-type mean activity distribution for every feature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> – AnnData object with categorical annotations in <code class="docutils literal notranslate"><span class="pre">.obs</span></code></p></li>
+<li><p><strong>lc</strong> – LayerConfig specifying which layer to transform</p></li>
+<li><p><strong>class_obs_key</strong> – Key in <code class="docutils literal notranslate"><span class="pre">adata.obs</span></code> for the class grouping</p></li>
+<li><p><strong>celltype_obs_key</strong> – Key in <code class="docutils literal notranslate"><span class="pre">adata.obs</span></code> for the cell-type grouping</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Polars DataFrame with entropy and prevalence columns per class and feature</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sparscit.advanced.silhouette_score">
+<span class="sig-prename descclassname"><span class="pre">sparscit.advanced.</span></span><span class="sig-name descname"><span class="pre">silhouette_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnnData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/sparscit/advanced/_community.html#silhouette_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sparscit.advanced.silhouette_score" title="Link to this definition"></a></dt>
+<dd><p>Returns dictionary of silhouette scores per cluster</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong></p></li>
+<li><p><strong>obs_key</strong></p></li>
+<li><p><strong>embedding_key</strong></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="sparscit.advanced.plotting.html" class="btn btn-neutral float-left" title="Advanced Plotting (sparscit.adv.pl)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

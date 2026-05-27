@@ -1,0 +1,291 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sparscit.advanced._features &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/icon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sparscit.advanced._features</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sparscit.advanced._features</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..tools._layers</span><span class="w"> </span><span class="kn">import</span> <span class="n">LayerConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+
+<span class="n">_alignment</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;bin&#39;</span><span class="p">,</span> <span class="s1">&#39;gene&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="align_features">
+<a class="viewcode-back" href="../../../sparscit.advanced.default.html#sparscit.advanced.align_features">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">align_features</span><span class="p">(</span>
+        <span class="n">bin_adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">gene_adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">bin_features</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">gene_features</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Align feature indices in two datas.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    bin_adata</span>
+<span class="sd">    gene_adata</span>
+<span class="sd">    bin_features</span>
+<span class="sd">    gene_features</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bin_adata.uns[&#39;aligned_features&#39;], gene_adata.uns[&#39;aligned_features&#39;]</span>
+<span class="sd">        Dict of keys &#39;names&#39;, &#39;bin_indices&#39;, &#39;gene_indices&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bin_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">bin_features</span><span class="p">))</span>
+    <span class="n">gene_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">gene_features</span><span class="p">))</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">intersect1d</span><span class="p">(</span><span class="n">gene_features</span><span class="p">,</span> <span class="n">bin_features</span><span class="p">)</span>
+    <span class="n">cttag_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">bin_features</span> <span class="o">==</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">features</span><span class="p">])</span>
+    <span class="n">rna_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">gene_features</span> <span class="o">==</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">features</span><span class="p">])</span>
+    <span class="n">fd</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="n">features</span><span class="p">,</span>
+        <span class="s1">&#39;gene_indices&#39;</span><span class="p">:</span> <span class="n">rna_f</span><span class="p">,</span>
+        <span class="s1">&#39;bin_indices&#39;</span><span class="p">:</span> <span class="n">cttag_f</span>
+    <span class="p">}</span>
+    <span class="n">bin_adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;aligned_features&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">gene_adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;aligned_features&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="binary_active_feature">
+<a class="viewcode-back" href="../../../sparscit.advanced.default.html#sparscit.advanced.binary_active_feature">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">binary_active_feature</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">layer</span><span class="p">:</span> <span class="n">LayerConfig</span><span class="p">,</span>
+        <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">alignment_type</span><span class="p">:</span> <span class="n">_alignment</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a boolean mask of features that are active in at least one cell.</span>
+
+<span class="sd">    A feature is considered active if the binarized layer sum across cells</span>
+<span class="sd">    exceeds ``threshold``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        AnnData object</span>
+<span class="sd">    layer</span>
+<span class="sd">        LayerConfig specifying which layer to transform</span>
+<span class="sd">    threshold</span>
+<span class="sd">        Minimum number of active cells for a feature to be considered active</span>
+<span class="sd">    alignment_type</span>
+<span class="sd">        If set, restrict the mask to features aligned under the given type</span>
+<span class="sd">        (``&#39;bin&#39;`` or ``&#39;gene&#39;``)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Boolean array indicating which features are active</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_all</span> <span class="o">=</span> <span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">binarize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_view_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">alignment_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_all</span> <span class="o">=</span> <span class="n">_all</span><span class="p">[</span><span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;aligned_features&#39;</span><span class="p">][</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">alignment_type</span><span class="si">}</span><span class="s1">_indices&#39;</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">_all</span></div>
+
+
+
+<div class="viewcode-block" id="multi_color_copy">
+<a class="viewcode-back" href="../../../sparscit.advanced.default.html#sparscit.advanced.multi_color_copy">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">multi_color_copy</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">layers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">LayerConfig</span><span class="p">],</span>
+        <span class="n">colors</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;#fff&#39;</span><span class="p">,</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;#485fd8&#39;</span><span class="p">,</span>
+            <span class="mi">10</span><span class="p">:</span> <span class="s1">&#39;tab:red&#39;</span><span class="p">,</span>
+            <span class="mi">11</span><span class="p">:</span> <span class="s1">&#39;#c3b812&#39;</span>
+        <span class="p">}</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Combine multiple binary layers into a single categorical observation.</span>
+
+<span class="sd">    Each layer contributes a digit in a base-10 encoding; the resulting</span>
+<span class="sd">    categories are stored in ``adata.obs[&#39;copied_data&#39;]`` and the colour</span>
+<span class="sd">    mapping in ``adata.uns[&#39;colors_dict&#39;]``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        AnnData object to annotate</span>
+<span class="sd">    layers</span>
+<span class="sd">        List of LayerConfigs to combine</span>
+<span class="sd">    colors</span>
+<span class="sd">        Mapping from encoded category value to colour string</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Boolean mask of cells with non-zero combined activity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scalar</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">layers</span><span class="p">))</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">l</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">use_cached_mask</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">binarize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span><span class="o">.</span><span class="n">A1</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">])</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;copied_data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">scalar</span> <span class="o">@</span> <span class="n">datas</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">))</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;copied_data&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;colors_dict&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">colors</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;colors_dict&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">d</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;colors_dict&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
+        <span class="n">k</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;copied_data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">mask</span></div>
+
+
+
+<div class="viewcode-block" id="feature_to_bed">
+<a class="viewcode-back" href="../../../sparscit.advanced.default.html#sparscit.advanced.feature_to_bed">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">feature_to_bed</span><span class="p">(</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">features</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write selected features to a BED file.</span>
+
+<span class="sd">    Features are expected in ``chr:start-end`` format and are split on</span>
+<span class="sd">    ``:`` and ``-`` to produce the three required BED columns.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path</span>
+<span class="sd">        Output BED file path</span>
+<span class="sd">    features</span>
+<span class="sd">        Array of feature strings in ``chr:start-end`` format</span>
+<span class="sd">    mask</span>
+<span class="sd">        Boolean mask selecting which features to write</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">feats</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+    <span class="n">feats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">f</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">feats</span>
+    <span class="p">])</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">feats</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;chrom&quot;</span><span class="p">,</span> <span class="s2">&quot;chromStart&quot;</span><span class="p">,</span> <span class="s2">&quot;chromEnd&quot;</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="s2">&quot;strand&quot;</span><span class="p">,</span> <span class="s2">&quot;thickStart&quot;</span><span class="p">,</span> <span class="s2">&quot;thickEnd&quot;</span><span class="p">,</span> <span class="s2">&quot;itemRgb&quot;</span><span class="p">,</span> <span class="s2">&quot;blockCount&quot;</span><span class="p">,</span> <span class="s2">&quot;blockSizes&quot;</span><span class="p">,</span> <span class="s2">&quot;blockStarts&quot;</span><span class="p">]:</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="dense_binary_activity_matrix">
+<a class="viewcode-back" href="../../../sparscit.advanced.default.html#sparscit.advanced.dense_binary_activity_matrix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dense_binary_activity_matrix</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">layer</span><span class="p">:</span> <span class="n">LayerConfig</span><span class="p">,</span>
+        <span class="n">mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract a dense boolean matrix of activity for selected features.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        AnnData object</span>
+<span class="sd">    layer</span>
+<span class="sd">        LayerConfig specifying which layer to transform</span>
+<span class="sd">    mask</span>
+<span class="sd">        Boolean feature mask selecting which columns to keep</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dense boolean array of shape (n_cells, n_selected_features)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">binarize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_view_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">l</span><span class="p">[:,</span> <span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">todense</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

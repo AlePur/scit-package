@@ -1,0 +1,263 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sparscit.plotting._statistics &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/icon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sparscit.plotting._statistics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sparscit.plotting._statistics</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.figure</span><span class="w"> </span><span class="kn">import</span> <span class="n">Figure</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sts</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.int</span><span class="w"> </span><span class="kn">import</span> <span class="n">scatter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArgAssert</span>
+<span class="c1">#from .._settings import settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">MplWrap</span>
+
+
+<div class="viewcode-block" id="volcano_plot">
+<a class="viewcode-back" href="../../../sparscit.plotting.html#sparscit.plotting.volcano_plot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">volcano_plot</span><span class="p">(</span>
+        <span class="n">pval</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">lfc</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">min_pval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+        <span class="n">min_lfc</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">yminmax</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="n">xminmax</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="n">zero_to_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">s</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a volcano plot from p-values and log-fold changes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pval</span>
+<span class="sd">        Adjusted p-values for each feature</span>
+<span class="sd">    lfc</span>
+<span class="sd">        Log2 fold-change values for each feature</span>
+<span class="sd">    min_pval</span>
+<span class="sd">        Significance threshold for p-values</span>
+<span class="sd">    min_lfc</span>
+<span class="sd">        Minimum absolute log2 fold-change for significance</span>
+<span class="sd">    yminmax</span>
+<span class="sd">        Y-axis limits for the plot</span>
+<span class="sd">    xminmax</span>
+<span class="sd">        X-axis limits for the plot</span>
+<span class="sd">    zero_to_min</span>
+<span class="sd">        Replace zero p-values with the minimum non-zero p-value</span>
+<span class="sd">    show</span>
+<span class="sd">        Whether to show the plot immediately</span>
+<span class="sd">    s</span>
+<span class="sd">        Marker size for the scatter plot</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Matplotlib Figure if ``show`` is ``False``, otherwise ``None``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_pval</span> <span class="o">=</span> <span class="n">pval</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">zero_to_min</span><span class="p">:</span>
+        <span class="n">_pval</span><span class="p">[</span><span class="n">_pval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">_pval</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">_pval</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">_pval</span><span class="p">)</span>
+    <span class="n">is_sig</span> <span class="o">=</span> <span class="p">(</span><span class="n">_pval</span> <span class="o">&lt;</span> <span class="n">min_pval</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lfc</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">min_lfc</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">scatter</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">lfc</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">_pval</span><span class="p">)],</span>
+        <span class="n">xminmax</span><span class="o">=</span><span class="n">xminmax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span>
+    <span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+        <span class="n">lfc</span><span class="p">[</span><span class="o">~</span><span class="n">is_sig</span><span class="p">],</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">_pval</span><span class="p">[</span><span class="o">~</span><span class="n">is_sig</span><span class="p">]),</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;tab:gray&#39;</span>
+    <span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">*</span><span class="n">yminmax</span><span class="p">)</span>
+    <span class="n">kwarg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">transform</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+        <span class="n">wrap</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+        <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(((</span><span class="n">lfc</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">is_sig</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39; down&#39;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwarg</span>
+    <span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+        <span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(((</span><span class="n">lfc</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">is_sig</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39; up&#39;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwarg</span>
+    <span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;-log10(adjP)&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;log2FC&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">min_pval</span><span class="p">),</span> <span class="n">xminmax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xminmax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:red&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="o">-</span><span class="n">min_lfc</span><span class="p">,</span> <span class="n">yminmax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">yminmax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:red&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">min_lfc</span><span class="p">,</span> <span class="n">yminmax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">yminmax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:red&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="explained_variance_ratio">
+<a class="viewcode-back" href="../../../sparscit.plotting.html#sparscit.plotting.explained_variance_ratio">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">explained_variance_ratio</span><span class="p">(</span>
+        <span class="n">explained_variance</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">n_pcs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">Figure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot explained variance ratio from :func:`toolkit.tl.pca`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    explained_variance</span>
+<span class="sd">        Array of explained variance</span>
+<span class="sd">    n_pcs</span>
+<span class="sd">        Number of principal components to plot</span>
+<span class="sd">    show</span>
+<span class="sd">        Show plot</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">explained_variance</span> <span class="o">=</span> <span class="n">explained_variance</span><span class="p">[:</span><span class="n">n_pcs</span><span class="p">]</span>
+
+    <span class="n">plw</span> <span class="o">=</span> <span class="n">MplWrap</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+    
+    <span class="n">plw</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">explained_variance</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">explained_variance</span><span class="p">)</span>
+    <span class="n">plw</span><span class="o">.</span><span class="n">despine</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">plw</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="depth_corr">
+<a class="viewcode-back" href="../../../sparscit.plotting.html#sparscit.plotting.depth_corr">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">depth_corr</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">embedding_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">layer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">Figure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate correlation between total counts and embedding dimensions</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">    embedding_key</span>
+<span class="sd">        Embedding in .obsm to use for calculating correlation</span>
+<span class="sd">    layer</span>
+<span class="sd">        Layer to use for calculating correlation</span>
+<span class="sd">    show</span>
+<span class="sd">        Show plot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ArgAssert</span><span class="p">(</span><span class="n">layer</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;layer not in .layers&quot;</span><span class="p">)</span>
+    <span class="n">ArgAssert</span><span class="p">(</span><span class="n">embedding_key</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;embedding_key not in .obsm&quot;</span><span class="p">)</span>
+    <span class="n">ArgAssert</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">layer</span><span class="si">}</span><span class="s1">_total_counts&#39;</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="s2">&quot;please run toolkit.tl.add_metadata&quot;</span><span class="p">)</span>
+
+    <span class="n">pers</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">embedding_key</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">arr</span><span class="o">=</span><span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">embedding_key</span><span class="p">][:,</span><span class="n">s</span><span class="p">]</span>
+        <span class="n">pers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sts</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">layer</span><span class="si">}</span><span class="s1">_total_counts&#39;</span><span class="p">],</span> <span class="n">arr</span><span class="p">))</span>
+
+    <span class="n">plw</span> <span class="o">=</span> <span class="n">MplWrap</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+    <span class="n">plw</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">embedding_key</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">statistic</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pers</span><span class="p">])</span>
+    <span class="n">plw</span><span class="o">.</span><span class="n">despine</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">plw</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

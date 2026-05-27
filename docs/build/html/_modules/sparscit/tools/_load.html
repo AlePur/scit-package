@@ -1,0 +1,192 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sparscit.tools._load &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/icon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sparscit.tools._load</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sparscit.tools._load</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="n">_dict_name</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;DM6&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="get_genome_dict">
+<a class="viewcode-back" href="../../../sparscit.tools.html#sparscit.tools.get_genome_dict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_genome_dict</span><span class="p">(</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">_dict_name</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a default genome dict by name.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name</span>
+<span class="sd">        Supported names include &#39;DM6&#39;, &#39;GRCm39&#39;, &#39;GRCh38&#39;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary mapping chromosome names to their lengths in base pairs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;DM6&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;chrX&quot;</span><span class="p">:</span> <span class="mi">23542271</span><span class="p">,</span>
+            <span class="s2">&quot;chr2L&quot;</span><span class="p">:</span> <span class="mi">23513712</span><span class="p">,</span>
+            <span class="s2">&quot;chr2R&quot;</span><span class="p">:</span> <span class="mi">25286936</span><span class="p">,</span>
+            <span class="s2">&quot;chr3L&quot;</span><span class="p">:</span> <span class="mi">28110227</span><span class="p">,</span>
+            <span class="s2">&quot;chr3R&quot;</span><span class="p">:</span> <span class="mi">32079331</span><span class="p">,</span>
+            <span class="s2">&quot;chr4&quot;</span><span class="p">:</span> <span class="mi">1348131</span><span class="p">,</span>
+            <span class="s2">&quot;chrY&quot;</span><span class="p">:</span> <span class="mi">3667352</span><span class="p">,</span>
+            <span class="s2">&quot;chrM&quot;</span><span class="p">:</span> <span class="mi">19524</span>
+        <span class="p">}</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;GRCm39&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;chr1&quot;</span><span class="p">:</span> <span class="mi">195154279</span><span class="p">,</span>
+            <span class="s2">&quot;chr2&quot;</span><span class="p">:</span> <span class="mi">181755017</span><span class="p">,</span>
+            <span class="s2">&quot;chr3&quot;</span><span class="p">:</span> <span class="mi">159745316</span><span class="p">,</span>
+            <span class="s2">&quot;chr4&quot;</span><span class="p">:</span> <span class="mi">156860686</span><span class="p">,</span>
+            <span class="s2">&quot;chr5&quot;</span><span class="p">:</span> <span class="mi">151758149</span><span class="p">,</span>
+            <span class="s2">&quot;chr6&quot;</span><span class="p">:</span> <span class="mi">149588044</span><span class="p">,</span>
+            <span class="s2">&quot;chr7&quot;</span><span class="p">:</span> <span class="mi">144995196</span><span class="p">,</span>
+            <span class="s2">&quot;chr8&quot;</span><span class="p">:</span> <span class="mi">130127694</span><span class="p">,</span>
+            <span class="s2">&quot;chr9&quot;</span><span class="p">:</span> <span class="mi">124359700</span><span class="p">,</span>
+            <span class="s2">&quot;chr10&quot;</span><span class="p">:</span> <span class="mi">130530862</span><span class="p">,</span>
+            <span class="s2">&quot;chr11&quot;</span><span class="p">:</span> <span class="mi">121973369</span><span class="p">,</span>
+            <span class="s2">&quot;chr12&quot;</span><span class="p">:</span> <span class="mi">120092757</span><span class="p">,</span>
+            <span class="s2">&quot;chr13&quot;</span><span class="p">:</span> <span class="mi">120883175</span><span class="p">,</span>
+            <span class="s2">&quot;chr14&quot;</span><span class="p">:</span> <span class="mi">125139656</span><span class="p">,</span>
+            <span class="s2">&quot;chr15&quot;</span><span class="p">:</span> <span class="mi">104073951</span><span class="p">,</span>
+            <span class="s2">&quot;chr16&quot;</span><span class="p">:</span> <span class="mi">98008968</span><span class="p">,</span>
+            <span class="s2">&quot;chr17&quot;</span><span class="p">:</span> <span class="mi">95294699</span><span class="p">,</span>
+            <span class="s2">&quot;chr18&quot;</span><span class="p">:</span> <span class="mi">90720763</span><span class="p">,</span>
+            <span class="s2">&quot;chr19&quot;</span><span class="p">:</span> <span class="mi">61420004</span><span class="p">,</span>
+            <span class="s2">&quot;chrX&quot;</span><span class="p">:</span> <span class="mi">169476592</span><span class="p">,</span>
+            <span class="s2">&quot;chrY&quot;</span><span class="p">:</span> <span class="mi">91455967</span>
+        <span class="p">}</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;GRCh38&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;chr1&quot;</span><span class="p">:</span> <span class="mi">248956422</span><span class="p">,</span>
+            <span class="s2">&quot;chr2&quot;</span><span class="p">:</span> <span class="mi">242193529</span><span class="p">,</span>
+            <span class="s2">&quot;chr3&quot;</span><span class="p">:</span> <span class="mi">198295559</span><span class="p">,</span>
+            <span class="s2">&quot;chr4&quot;</span><span class="p">:</span> <span class="mi">190214555</span><span class="p">,</span>
+            <span class="s2">&quot;chr5&quot;</span><span class="p">:</span> <span class="mi">181538259</span><span class="p">,</span>
+            <span class="s2">&quot;chr6&quot;</span><span class="p">:</span> <span class="mi">170805979</span><span class="p">,</span>
+            <span class="s2">&quot;chr7&quot;</span><span class="p">:</span> <span class="mi">159345973</span><span class="p">,</span>
+            <span class="s2">&quot;chr8&quot;</span><span class="p">:</span> <span class="mi">145138636</span><span class="p">,</span>
+            <span class="s2">&quot;chr9&quot;</span><span class="p">:</span> <span class="mi">138394717</span><span class="p">,</span>
+            <span class="s2">&quot;chr10&quot;</span><span class="p">:</span> <span class="mi">133797422</span><span class="p">,</span>
+            <span class="s2">&quot;chr11&quot;</span><span class="p">:</span> <span class="mi">135086622</span><span class="p">,</span>
+            <span class="s2">&quot;chr12&quot;</span><span class="p">:</span> <span class="mi">133275309</span><span class="p">,</span>
+            <span class="s2">&quot;chr13&quot;</span><span class="p">:</span> <span class="mi">114364328</span><span class="p">,</span>
+            <span class="s2">&quot;chr14&quot;</span><span class="p">:</span> <span class="mi">107043718</span><span class="p">,</span>
+            <span class="s2">&quot;chr15&quot;</span><span class="p">:</span> <span class="mi">101991189</span><span class="p">,</span>
+            <span class="s2">&quot;chr16&quot;</span><span class="p">:</span> <span class="mi">90338345</span><span class="p">,</span>
+            <span class="s2">&quot;chr17&quot;</span><span class="p">:</span> <span class="mi">83257441</span><span class="p">,</span>
+            <span class="s2">&quot;chr18&quot;</span><span class="p">:</span> <span class="mi">80373285</span><span class="p">,</span>
+            <span class="s2">&quot;chr19&quot;</span><span class="p">:</span> <span class="mi">58617616</span><span class="p">,</span>
+            <span class="s2">&quot;chr20&quot;</span><span class="p">:</span> <span class="mi">64444167</span><span class="p">,</span>
+            <span class="s2">&quot;chr21&quot;</span><span class="p">:</span> <span class="mi">46709983</span><span class="p">,</span>
+            <span class="s2">&quot;chr22&quot;</span><span class="p">:</span> <span class="mi">50818468</span><span class="p">,</span>
+            <span class="s2">&quot;chrX&quot;</span><span class="p">:</span> <span class="mi">156040895</span><span class="p">,</span>
+            <span class="s2">&quot;chrY&quot;</span><span class="p">:</span> <span class="mi">57227415</span>
+        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> not supported, please make dict manually&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,649 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sparscit.tools._layers &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/icon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sparscit.tools._layers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sparscit.tools._layers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ad</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Self</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">csr_matrix</span><span class="p">,</span> <span class="n">issparse</span><span class="p">,</span> <span class="n">diags</span><span class="p">,</span> <span class="n">eye</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sps</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sts</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">._transforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">_idf</span><span class="p">,</span> <span class="n">_l2norm</span><span class="p">,</span> <span class="n">_mfrob</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArgAssert</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logging</span>
+
+<span class="n">mode_type</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;add&#39;</span><span class="p">,</span> <span class="s1">&#39;subtract&#39;</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_format_var_names</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert feature names to a numpy array if not already.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">fn</span><span class="p">))</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">LayerConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Configuration for a data layer in an AnnData object, specifying transformations</span>
+<span class="sd">    and feature selection to apply when the layer is accessed.</span>
+
+<span class="sd">    Stores normalization, transformation, and feature masking options. Use</span>
+<span class="sd">    :func:`make_layer_config` to construct instances with defaults.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    layer : str</span>
+<span class="sd">        Key of the layer in ``adata.layers`` or ``adata.obsm``</span>
+<span class="sd">    normalize_with_obs_counts : bool</span>
+<span class="sd">        Whether to normalize by per-observation (cell) total counts</span>
+<span class="sd">    log_transform : bool</span>
+<span class="sd">        Whether to apply ``np.log1p`` transformation</span>
+<span class="sd">    norm_total : float</span>
+<span class="sd">        Scaling factor after count normalization</span>
+<span class="sd">    feature_active_threshold : float | None</span>
+<span class="sd">        Threshold for binarizing features as &quot;active&quot;</span>
+<span class="sd">    in_obsm : bool</span>
+<span class="sd">        If True, look up the layer in ``adata.obsm`` instead of ``adata.layers``</span>
+<span class="sd">    feature_names : np.ndarray | None</span>
+<span class="sd">        Names of all features in the layer</span>
+<span class="sd">    normalize_with_l2_norm : bool</span>
+<span class="sd">        Whether to normalize by L2 norm per observation</span>
+<span class="sd">    idf_transform : bool</span>
+<span class="sd">        Whether to apply inverse-document-frequency weighting</span>
+<span class="sd">    mean_ranks_uniform_with : np.ndarray | None</span>
+<span class="sd">        Reference mean vector for rank-based scalar alignment</span>
+<span class="sd">    cache_transform : bool</span>
+<span class="sd">        Whether to cache the transformed matrix (currently not fully implemented)</span>
+<span class="sd">    scalar : float</span>
+<span class="sd">        Multiplicative scalar applied to the transformed matrix</span>
+<span class="sd">    cached_mask : np.ndarray | None</span>
+<span class="sd">        Boolean mask of selected features</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_markdown_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Layer config: </span><span class="se">\&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layer</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2"> with normalize_with_obs_counts=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">normalize_with_obs_counts</span><span class="si">}</span><span class="s2">, log_transform=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">log_transform</span><span class="si">}</span><span class="s2">, norm_total=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">norm_total</span><span class="si">}</span><span class="s2">, feature_active_threshold=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_active_threshold</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">layer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">normalize_with_obs_counts</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+            <span class="n">log_transform</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+            <span class="n">norm_total</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="n">feature_active_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">in_obsm</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+            <span class="n">feature_names</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">cache_transform</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+            <span class="n">normalize_with_l2_norm</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+            <span class="n">mean_ranks_uniform_with</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">idf_transform</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_obsm</span> <span class="o">=</span> <span class="n">in_obsm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer</span> <span class="o">=</span> <span class="n">layer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalize_with_obs_counts</span> <span class="o">=</span> <span class="n">normalize_with_obs_counts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalize_with_l2_norm</span> <span class="o">=</span> <span class="n">normalize_with_l2_norm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idf_transform</span> <span class="o">=</span> <span class="n">idf_transform</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_transform</span> <span class="o">=</span> <span class="n">log_transform</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm_total</span> <span class="o">=</span> <span class="n">norm_total</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_active_threshold</span> <span class="o">=</span> <span class="n">feature_active_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="n">feature_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean_ranks_uniform_with</span> <span class="o">=</span> <span class="n">mean_ranks_uniform_with</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="n">_a</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cached_mask</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_transform</span> <span class="o">=</span> <span class="n">cache_transform</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cached_shape</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cached_matrix</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_cached_mask</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="c1"># This will always use cached_mask</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;feature_names were not provided when the layer config was created&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_cached_mask</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_mask</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cached_mask</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cached_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;cached_mask is not set. Please pick features&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_mask</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_active_threshold</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;This LayerConfig has not been provided a feature_active_threshold. Please generate a new one and set &quot;</span>
+                <span class="s2">&quot;a relevant value&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_active_threshold</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_adata</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_obsm</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">adata</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">verify_adata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">):</span>
+        <span class="n">ArgAssert</span><span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_obsm</span> <span class="k">else</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+            <span class="sa">f</span><span class="s2">&quot;layer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layer</span><span class="si">}</span><span class="s2"> not found in anndata</span><span class="si">{</span><span class="s1">&#39;.obsm&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">in_obsm</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;.layers&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">return_view_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">use_cached_mask</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">binarize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">raw_view</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csr_matrix</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_adata</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_return</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">csr_matrix</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">binarize</span><span class="p">:</span>
+                <span class="n">X</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">data</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_threshold</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_matrix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_shape</span> <span class="o">==</span> <span class="n">adata</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="c1"># Will cause bug if layerconfig parameters are later modified</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;cache is not implemented&#39;</span><span class="p">)</span>
+            <span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_matrix</span>
+            <span class="c1"># Already transformed</span>
+            <span class="n">return_view_only</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_obsm</span><span class="p">:</span>
+                <span class="n">view</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">layer</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">view</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">layer</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">use_cached_mask</span><span class="p">:</span>
+            <span class="n">ArgAssert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cached_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Please pick features with layer_pick_features&quot;</span><span class="p">)</span>
+            <span class="n">desiredmask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_mask</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">desiredmask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">view</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">raw_view</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">view</span>
+
+        <span class="k">if</span> <span class="n">return_view_only</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_prepare_return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">*</span> <span class="n">view</span><span class="p">[:,</span> <span class="n">desiredmask</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+        <span class="n">copy_now_cut_later</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_with_l2_norm</span><span class="p">:</span>
+            <span class="n">copy_now_cut_later</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_ranks_uniform_with</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">copy_now_cut_later</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># For obs_norm</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span>
+        
+        <span class="k">if</span> <span class="n">copy_now_cut_later</span><span class="p">:</span>
+            <span class="n">_X</span><span class="p">:</span> <span class="n">csr_matrix</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_X</span><span class="p">:</span> <span class="n">csr_matrix</span> <span class="o">=</span> <span class="n">view</span><span class="p">[:,</span> <span class="n">desiredmask</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">sps</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">_X</span><span class="p">):</span>
+            <span class="n">_X</span> <span class="o">=</span> <span class="n">_X</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_X</span> <span class="o">=</span> <span class="n">sps</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">_X</span><span class="p">)</span>
+
+        <span class="c1">#ArgAssert(not (self.log_transform and self.idf_transform), &#39;Both idf and log-transform cannot be True&#39;)</span>
+
+        <span class="c1"># Be careful, some features might have been removed if copy_now_cut_later==False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">idf_transform</span><span class="p">:</span>
+            <span class="n">_X</span> <span class="o">=</span> <span class="n">_idf</span><span class="p">(</span><span class="n">_X</span><span class="p">,</span> <span class="n">allow_zeros</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_with_obs_counts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">idf_transform</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;idf_transform should probably be used together with normalize_with_l2_norm&#39;</span><span class="p">)</span>
+            <span class="n">_X</span> <span class="o">=</span> <span class="p">(</span><span class="n">diags</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">d</span><span class="p">)</span> <span class="o">@</span> <span class="n">_X</span><span class="p">)</span>
+            <span class="n">_X</span><span class="o">.</span><span class="n">data</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_total</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_with_l2_norm</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_with_obs_counts</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;normalize_with_obs_counts and normalize_with_l2_norm cannot be used together&#39;</span><span class="p">)</span>
+            <span class="n">_X</span> <span class="o">=</span> <span class="n">_l2norm</span><span class="p">(</span><span class="n">_X</span><span class="o">.</span><span class="n">tocsr</span><span class="p">())</span>
+            <span class="n">_X</span><span class="o">.</span><span class="n">data</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_total</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_transform</span><span class="p">:</span>
+            <span class="n">_X</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">_X</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="c1"># if self.cache_transform:</span>
+        <span class="c1">#     if _X.data.nbytes &gt; 2*(10**9):</span>
+        <span class="c1">#         logging.warning(&#39;Caching the transformed matrix of this layer_config takes more than 2GB of memory. If &#39;</span>
+        <span class="c1">#                         &#39;you want to keep your memory free, set cache_transform to false&#39;)</span>
+        <span class="c1">#     self.cached_matrix = _X.copy()</span>
+        <span class="c1">#     self.cached_shape = adata.shape</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_ranks_uniform_with</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">idf_transform</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;idf_transform and mean_ranks_uniform_with cannot be used together&#39;</span><span class="p">)</span>
+            <span class="n">_mean0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_ranks_uniform_with</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_mean0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s2">&quot;mean_ranks_uniform_with needs to be a numpy array&quot;</span>
+            <span class="n">_mean1</span> <span class="o">=</span> <span class="n">get_layer_feature_means</span><span class="p">(</span><span class="n">raw_X</span> <span class="o">=</span> <span class="n">_X</span><span class="p">)</span>
+            <span class="n">sclrs</span> <span class="o">=</span> <span class="n">get_rank_scalars</span><span class="p">(</span><span class="n">_mean0</span><span class="p">,</span> <span class="n">_mean1</span><span class="p">)</span>
+            <span class="n">_X</span> <span class="o">=</span> <span class="n">_X</span> <span class="o">@</span> <span class="n">sps</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">sclrs</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">copy_now_cut_later</span><span class="p">:</span>
+            <span class="n">__X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">*</span> <span class="n">_X</span><span class="p">[:,</span> <span class="n">desiredmask</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">__X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">*</span> <span class="n">_X</span>
+        <span class="k">return</span> <span class="n">_prepare_return</span><span class="p">(</span><span class="n">__X</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_layer_feature_means">
+<a class="viewcode-back" href="../../../sparscit.tools.html#sparscit.tools.get_layer_feature_means">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_layer_feature_means</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">layer</span><span class="p">:</span> <span class="n">LayerConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">raw_X</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">return_nans</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the per-feature mean across all observations.</span>
+
+<span class="sd">    Either provide ``raw_X`` directly, or provide both ``adata`` and ``layer``</span>
+<span class="sd">    to transform the data first.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        Annotated data matrix (required if ``raw_X`` is not given)</span>
+<span class="sd">    layer</span>
+<span class="sd">        Layer configuration (required if ``raw_X`` is not given)</span>
+<span class="sd">    raw_X</span>
+<span class="sd">        Pre-transformed sparse matrix; mutually exclusive with ``adata``/``layer``</span>
+<span class="sd">    return_nans</span>
+<span class="sd">        If True, include features with NaN means in the result;</span>
+<span class="sd">        if False, filter them out</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Array of per-feature means</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">raw_X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">adata</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">layer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">),</span> <span class="s2">&quot;provide raw_X or adata+layer, not both&quot;</span>
+    <span class="k">if</span> <span class="n">raw_X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_X</span> <span class="o">=</span> <span class="n">raw_X</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_X</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">use_cached_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    
+    <span class="n">_m</span> <span class="o">=</span> <span class="n">_X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span> <span class="o">/</span> <span class="n">_X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">return_nans</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_m</span>
+    <span class="k">return</span> <span class="n">_m</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">_m</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="layer_pick_features">
+<a class="viewcode-back" href="../../../sparscit.tools.html#sparscit.tools.layer_pick_features">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">layer_pick_features</span><span class="p">(</span>
+        
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">layer</span><span class="p">:</span> <span class="n">LayerConfig</span><span class="p">,</span>
+        <span class="n">feature_index</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">after_binarization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">filter_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">filter_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set picked features in layer config to be used later.</span>
+<span class="sd">    Does NOT guarantee that two layers with same picked features will have them in the same order, since</span>
+<span class="sd">    the cached mask is a binary mask and does not change the order of the features</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">    layer</span>
+<span class="sd">        LayerConfig</span>
+<span class="sd">    feature_index</span>
+<span class="sd">        Indices or names of features to pick</span>
+<span class="sd">    after_binarization</span>
+<span class="sd">        Whether to binarize counts and use the result for thresholding</span>
+<span class="sd">    filter_min, filter_max</span>
+<span class="sd">        If this is set, pick all features passing threshold instead of by index</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_nf</span> <span class="o">=</span> <span class="s2">&quot;It seems that there is no feature with the index as provided in var_index&quot;</span>
+    <span class="n">_se</span> <span class="o">=</span> <span class="s2">&quot;Either min_threshold, max_threshold or feature_index has to be set&quot;</span>
+
+    <span class="n">do_filter</span> <span class="o">=</span> <span class="n">filter_min</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">filter_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">do_filter</span><span class="p">:</span>
+
+        <span class="n">ArgAssert</span><span class="p">(</span><span class="n">feature_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">_se</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature_index</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature_index</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">feature_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">feature_index</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature_index</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">feature_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">feature_index</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">feature_index</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span>
+            <span class="n">layer</span><span class="o">.</span><span class="n">cached_mask</span> <span class="o">=</span> <span class="n">feature_index</span>
+        <span class="k">elif</span> <span class="n">feature_index</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span> <span class="ow">or</span> <span class="n">feature_index</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;U&#39;</span> <span class="ow">or</span> <span class="n">feature_index</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;O&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">layer</span><span class="o">.</span><span class="n">feature_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s1">&#39;feature_names is not set in the layer, so searching for feature&#39;</span>
+                    <span class="s1">&#39; based on name is not supported&#39;</span>
+                <span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">feature_names</span><span class="p">,</span> <span class="n">feature_index</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">_nf</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">e</span>
+
+            <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">_nf</span><span class="p">)</span>
+
+            <span class="n">layer</span><span class="o">.</span><span class="n">cached_mask</span> <span class="o">=</span> <span class="n">m</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">layer</span><span class="o">.</span><span class="n">cached_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">layer</span><span class="o">.</span><span class="n">get_shape</span><span class="p">(</span><span class="n">adata</span><span class="p">)[</span><span class="mi">1</span><span class="p">],),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+            <span class="n">layer</span><span class="o">.</span><span class="n">cached_mask</span><span class="p">[</span><span class="n">feature_index</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">after_binarization</span><span class="p">:</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span> <span class="o">&gt;</span> <span class="n">layer</span><span class="o">.</span><span class="n">get_threshold</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">filter_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filter_min</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">filter_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filter_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+        <span class="n">sumax</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span>
+        <span class="n">layer</span><span class="o">.</span><span class="n">cached_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">sumax</span> <span class="o">&gt;</span> <span class="n">filter_min</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">sumax</span> <span class="o">&lt;</span> <span class="n">filter_max</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Picked </span><span class="si">{</span><span class="n">layer</span><span class="o">.</span><span class="n">cached_mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s1"> features&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="make_layer_config">
+<a class="viewcode-back" href="../../../sparscit.tools.html#sparscit.tools.make_layer_config">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_layer_config</span><span class="p">(</span>
+        <span class="n">layer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">normalize_with_obs_counts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">log_transform</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">feature_names</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">in_obsm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">cache_transform</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">norm_total</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10000.0</span><span class="p">,</span>
+        <span class="n">idf_transform</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">normalize_with_l2_norm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">mean_ranks_uniform_with</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">feature_active_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LayerConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make :class:`LayerConfig`. Different transformation options are provided,</span>
+<span class="sd">    but not all options are mutually compatible. The default is to not transform the layer in any way.</span>
+<span class="sd">    All transformations are lazy, which means the raw data in the AnnData object is never changed, and only transformed</span>
+<span class="sd">    in memory when the need arises. The transformed layer is cached (not in the AnnData) if cache_transform is True.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    layer</span>
+<span class="sd">        Layers to consider</span>
+<span class="sd">    normalize_with_obs_counts</span>
+<span class="sd">        Normalize per-cell with obs counts</span>
+<span class="sd">    log_transform</span>
+<span class="sd">        Natural log transform the layer</span>
+<span class="sd">    feature_names</span>
+<span class="sd">        List of feature names for all features in layer</span>
+<span class="sd">    in_obsm</span>
+<span class="sd">        Whether layer is in .obsm. If False, try to find it in .layers</span>
+<span class="sd">    cache_transform</span>
+<span class="sd">        Whether to cache the transformed layer</span>
+<span class="sd">    norm_total</span>
+<span class="sd">        Number to scale counts by after normalizing</span>
+<span class="sd">    idf_transform</span>
+<span class="sd">        Use inverse-document-frequency to transform layer</span>
+<span class="sd">    normalize_with_l2_norm</span>
+<span class="sd">        Normalize per-cell by l2 norm</span>
+<span class="sd">    feature_active_threshold</span>
+<span class="sd">        Threshold (after all transformations) to consider count as &quot;active&quot;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`LayerConfig`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">feature_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No feature_names set for layer_config&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">LayerConfig</span><span class="p">(</span>
+        <span class="n">layer</span><span class="p">,</span>
+        <span class="n">normalize_with_obs_counts</span><span class="p">,</span>
+        <span class="n">log_transform</span><span class="p">,</span>
+        <span class="n">norm_total</span><span class="p">,</span>
+        <span class="n">feature_active_threshold</span><span class="p">,</span>
+        <span class="n">in_obsm</span><span class="p">,</span>
+        <span class="n">_format_var_names</span><span class="p">(</span><span class="n">feature_names</span><span class="p">),</span>
+        <span class="n">cache_transform</span><span class="p">,</span>
+        <span class="n">normalize_with_l2_norm</span><span class="p">,</span>
+        <span class="n">mean_ranks_uniform_with</span><span class="p">,</span>
+        <span class="n">idf_transform</span>
+    <span class="p">)</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_rank_scalars</span><span class="p">(</span><span class="n">mean0</span><span class="p">,</span> <span class="n">mean1</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">scalar_minmax</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute per-feature scaling factors so that the rank-ordered means of ``mean1``</span>
+<span class="sd">    align with those of ``mean0``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mean0 : np.ndarray</span>
+<span class="sd">        Reference mean vector to align to</span>
+<span class="sd">    mean1 : np.ndarray</span>
+<span class="sd">        Mean vector to scale</span>
+<span class="sd">    eps : float</span>
+<span class="sd">        Minimum value to prevent division by zero; values below this are clamped</span>
+<span class="sd">    scalar_minmax : tuple[float, float]</span>
+<span class="sd">        Minimum and maximum values for clipping the resulting scalars</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Per-feature scaling factors (clipped to ``scalar_minmax``)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mean0</span> <span class="o">=</span> <span class="n">mean0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">mean1</span> <span class="o">=</span> <span class="n">mean1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">mean0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">mean1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ranks0</span> <span class="o">=</span> <span class="n">sts</span><span class="o">.</span><span class="n">rankdata</span><span class="p">(</span><span class="n">mean0</span><span class="p">)</span>
+    <span class="n">ranks1</span> <span class="o">=</span> <span class="n">sts</span><span class="o">.</span><span class="n">rankdata</span><span class="p">(</span><span class="n">mean1</span><span class="p">)</span>
+    <span class="n">_ix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">ranks1</span><span class="p">)</span>
+    <span class="n">placed</span> <span class="o">=</span> <span class="n">_ix</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">ranks1</span><span class="p">,</span> <span class="n">ranks0</span><span class="p">,</span> <span class="n">sorter</span><span class="o">=</span><span class="n">_ix</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">mean0</span><span class="o">&lt;</span><span class="n">eps</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.1</span> <span class="ow">or</span> <span class="p">(</span><span class="n">mean1</span><span class="o">&lt;</span><span class="n">eps</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: rank scalar eps is too large, over 10{%} of the feature means are lower than eps.&quot;</span><span class="p">)</span>
+    <span class="c1"># print(f&quot;mean0: {(mean0&lt;eps).sum()} near zero, mean1: {(mean1&lt;eps).sum()} near zero, set those to {eps}&quot;)</span>
+    <span class="n">mean0</span><span class="p">[</span><span class="n">mean0</span><span class="o">&lt;</span><span class="n">eps</span><span class="p">]</span> <span class="o">=</span> <span class="n">eps</span>
+    <span class="n">mean1</span><span class="p">[</span><span class="n">mean1</span><span class="o">&lt;</span><span class="n">eps</span><span class="p">]</span> <span class="o">=</span> <span class="n">eps</span>
+    <span class="n">sclrs</span> <span class="o">=</span> <span class="n">mean0</span><span class="p">[</span><span class="n">placed</span><span class="p">]</span> <span class="o">/</span> <span class="n">mean1</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">sclrs</span><span class="p">,</span> <span class="n">scalar_minmax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">scalar_minmax</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<div class="viewcode-block" id="copy_to_obs">
+<a class="viewcode-back" href="../../../sparscit.tools.html#sparscit.tools.copy_to_obs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">copy_to_obs</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">layer_config</span><span class="p">:</span> <span class="n">LayerConfig</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">binarize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add data from layer or .obsm to obs for plotting.</span>
+
+<span class="sd">    Transforms the data according to the layer configuration, optionally</span>
+<span class="sd">    binarizes it, then writes the per-observation sum into ``adata.obs[&#39;copied_data&#39;]``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        Annotated data matrix</span>
+<span class="sd">    layer_config</span>
+<span class="sd">        Layer configuration specifying which data to transform and how</span>
+<span class="sd">    binarize</span>
+<span class="sd">        Use threshold set in LayerConfig to make counts binary (passing or not passing)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Writes the result into ``adata.obs[&#39;copied_data&#39;]``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">layer_config</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">use_cached_mask</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">binarize</span><span class="p">:</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">layer_config</span><span class="o">.</span><span class="n">get_threshold</span><span class="p">()</span>
+        <span class="n">X</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">data</span> <span class="o">&gt;</span> <span class="n">th</span>
+
+    <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;copied_data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span></div>
+
+
+<div class="viewcode-block" id="normalize_layers">
+<a class="viewcode-back" href="../../../sparscit.tools.html#sparscit.tools.normalize_layers">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">normalize_layers</span><span class="p">(</span>
+        <span class="n">adatas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AnnData</span><span class="p">],</span>
+        <span class="n">layer_configs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">LayerConfig</span><span class="p">],</span>
+        <span class="n">sample_k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">random_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write layer scalars into LayerConfigs.</span>
+
+<span class="sd">    Samples ``sample_k`` observations from each AnnData, computes the Frobenius</span>
+<span class="sd">    norm of the residual (X X^T - I) for each layer, and sets each layer&#39;s</span>
+<span class="sd">    ``scalar`` attribute so that layers are proportionally balanced.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adatas</span>
+<span class="sd">        List of AnnData objects, one per layer</span>
+<span class="sd">    layer_configs</span>
+<span class="sd">        List of :class:`LayerConfig` objects corresponding to each AnnData</span>
+<span class="sd">    sample_k</span>
+<span class="sd">        Number of observations to sample for norm estimation</span>
+<span class="sd">    random_seed</span>
+<span class="sd">        Random seed for sampling observations</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Modifies ``layer_configs[i].scalar`` in place</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gen</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">random_seed</span><span class="p">)</span>
+
+    <span class="n">X_norm</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">adatas</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">layer_configs</span><span class="p">)]</span>
+    <span class="n">ws</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">X_norm</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_norm</span><span class="p">)):</span>
+        <span class="n">X_sample</span> <span class="o">=</span> <span class="n">X_norm</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">gen</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">adatas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">sample_k</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="p">:]</span>
+        <span class="n">ws</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">_mfrob</span><span class="p">((</span><span class="n">X_sample</span> <span class="o">@</span> <span class="n">X_sample</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">-</span> <span class="n">eye</span><span class="p">(</span><span class="n">sample_k</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scale </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">th layer by </span><span class="si">{</span><span class="n">ws</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">layer_configs</span><span class="p">):</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">scalar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ws</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">ws</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

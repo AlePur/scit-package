@@ -1,0 +1,445 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sparscit.advanced._pomegranate &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/icon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sparscit.advanced._pomegranate</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sparscit.advanced._pomegranate</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">._hmm_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">_corr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._utils._kwargs</span><span class="w"> </span><span class="kn">import</span> <span class="n">_format_kwargs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArgAssert</span>
+
+<span class="n">_supported_dist</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="s1">&#39;exponential&#39;</span><span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">HMMListWrapper</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wrappers</span><span class="p">,</span> <span class="n">cell_type_scheme</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wrappers</span> <span class="o">=</span> <span class="n">wrappers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cell_type_scheme</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span> <span class="k">for</span> <span class="n">sc</span> <span class="ow">in</span> <span class="n">cell_type_scheme</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="o">=</span> <span class="n">wrappers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scheme</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_states</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wrappers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">state_dists</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">HMMWrapper</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">scheme</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">independent</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">independent</span> <span class="o">=</span> <span class="n">independent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="o">=</span> <span class="n">scheme</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_dists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dist_state_variables</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expected_observations</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observation_variance</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_states</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_dists</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_dists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dist_state_variables</span><span class="p">()</span>
+        <span class="c1"># This works for gamma and exponential</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expected_observations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_dists</span><span class="p">])</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_dists</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">sp</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observation_variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">sp</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dist_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_gamma</span><span class="p">(</span><span class="n">_shape</span><span class="p">,</span> <span class="n">_rate</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">_shape</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">_rate</span><span class="p">]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_exp</span><span class="p">(</span><span class="n">_scale</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">_scale</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">distributions</span><span class="p">:</span>
+            <span class="n">dpar</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">independent</span><span class="p">:</span>
+                <span class="n">dists</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">distributions</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dists</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">dists</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;Exponential&#39;</span><span class="p">:</span>
+                        <span class="n">dpar</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_exp</span><span class="p">(</span><span class="n">dists</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">scales</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">dpar</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_gamma</span><span class="p">(</span><span class="n">dists</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shapes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dists</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">rates</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>  <span class="c1"># .distributions[1])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">shapes</span><span class="p">)):</span>
+                    <span class="n">dpar</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_gamma</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">shapes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">d</span><span class="o">.</span><span class="n">rates</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>  <span class="c1"># .distributions[1])</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dpar</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">params</span>
+
+
+<div class="viewcode-block" id="create_hmm_system">
+<a class="viewcode-back" href="../../../sparscit.advanced.default.html#sparscit.advanced.create_hmm_system">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_hmm_system</span><span class="p">(</span>
+        <span class="n">n_states</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">hmm_scheme</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">_supported_dist</span><span class="p">],</span>
+        <span class="n">cell_type_scheme</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span>
+        <span class="n">hmm_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">inertia</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">early_stop_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">pomegranate_densehmm_kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HMMListWrapper</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a system of HMMs, one per cell-type scheme entry.</span>
+
+<span class="sd">    Each HMM in the system shares the same ``n_states`` and ``hmm_scheme``</span>
+<span class="sd">    but is trained on a different subset of cell types defined by</span>
+<span class="sd">    ``cell_type_scheme``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_states</span>
+<span class="sd">        Number of hidden states per HMM</span>
+<span class="sd">    hmm_scheme</span>
+<span class="sd">        List of distribution names (``&#39;gamma&#39;`` or ``&#39;exponential&#39;``)</span>
+<span class="sd">        per modality</span>
+<span class="sd">    cell_type_scheme</span>
+<span class="sd">        List of tuples; each tuple specifies which cell-type indices</span>
+<span class="sd">        the corresponding HMM covers</span>
+<span class="sd">    hmm_name</span>
+<span class="sd">        Name identifier for the HMM system</span>
+<span class="sd">    inertia</span>
+<span class="sd">        Inertia parameter passed to pomegranate&#39;s DenseHMM</span>
+<span class="sd">    early_stop_tol</span>
+<span class="sd">        Early-stopping tolerance for training</span>
+<span class="sd">    pomegranate_densehmm_kwargs</span>
+<span class="sd">        Extra keyword arguments forwarded to ``pomegranate.hmm.DenseHMM``</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    An :class:`HMMListWrapper` containing one HMM per scheme entry</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">st_scheme_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_type_scheme</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">HMMListWrapper</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">create_hmm</span><span class="p">(</span>
+                <span class="n">n_states</span><span class="o">=</span><span class="n">n_states</span><span class="p">,</span>
+                <span class="n">hmm_scheme</span><span class="o">=</span><span class="n">hmm_scheme</span><span class="p">,</span>
+                <span class="n">inertia</span><span class="o">=</span><span class="n">inertia</span><span class="p">,</span>
+                <span class="n">early_stop_tol</span><span class="o">=</span><span class="n">early_stop_tol</span><span class="p">,</span>
+                <span class="n">pomegranate_densehmm_kwargs</span><span class="o">=</span><span class="n">pomegranate_densehmm_kwargs</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">st_scheme_len</span><span class="p">)</span>
+        <span class="p">],</span>
+        <span class="n">cell_type_scheme</span><span class="p">,</span>
+        <span class="n">hmm_name</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="create_hmm">
+<a class="viewcode-back" href="../../../sparscit.advanced.default.html#sparscit.advanced.create_hmm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_hmm</span><span class="p">(</span>
+        <span class="n">n_states</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">hmm_scheme</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">_supported_dist</span><span class="p">],</span>
+        <span class="n">hmm_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;unnamed&#39;</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">inertia</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">early_stop_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="c1"># init_states_from_wrapper: HMMWrapper | None = None,</span>
+        <span class="n">pomegranate_densehmm_kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HMMWrapper</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a single Hidden Markov Model using pomegranate.</span>
+
+<span class="sd">    Builds a DenseHMM with the specified number of states and emission</span>
+<span class="sd">    distributions.  Distributions can be independent (one per modality)</span>
+<span class="sd">    or joint, depending on whether all entries in ``hmm_scheme`` are</span>
+<span class="sd">    identical.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_states</span>
+<span class="sd">        Number of hidden states</span>
+<span class="sd">    hmm_scheme</span>
+<span class="sd">        List of distribution names (``&#39;gamma&#39;`` or ``&#39;exponential&#39;``)</span>
+<span class="sd">        per modality</span>
+<span class="sd">    hmm_name</span>
+<span class="sd">        Name identifier for the model</span>
+<span class="sd">    inertia</span>
+<span class="sd">        Inertia parameter for training</span>
+<span class="sd">    early_stop_tol</span>
+<span class="sd">        Early-stopping tolerance</span>
+<span class="sd">    pomegranate_densehmm_kwargs</span>
+<span class="sd">        Extra keyword arguments forwarded to ``pomegranate.hmm.DenseHMM``</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    An :class:`HMMWrapper` around the created model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pomegranate.hmm</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">phmm</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pomegranate.distributions</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pdist</span>
+
+    <span class="n">independent</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">hs</span> <span class="o">==</span> <span class="n">hmm_scheme</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">hs</span> <span class="ow">in</span> <span class="n">hmm_scheme</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+    <span class="n">pomegranate_densehmm_kwargs</span> <span class="o">=</span> <span class="n">pomegranate_densehmm_kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">n_modalities</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hmm_scheme</span><span class="p">)</span>
+
+    <span class="n">dist_init</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">n_states</span><span class="p">,</span> <span class="n">n_modalities</span><span class="p">))</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">dist_init</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+    <span class="n">dist_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="nb">iter</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">pdist</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="n">dist_init</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">s</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_modalities</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">independent</span> <span class="k">else</span>
+                    <span class="n">pdist</span><span class="o">.</span><span class="n">IndependentComponents</span><span class="p">(</span>
+                       <span class="p">[</span>
+                           <span class="n">pdist</span><span class="o">.</span><span class="n">Gamma</span><span class="p">([</span><span class="n">dist_init</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]],</span> <span class="p">[</span><span class="n">s</span><span class="p">])</span>
+                           <span class="k">if</span> <span class="n">sc</span> <span class="o">==</span> <span class="s1">&#39;gamma&#39;</span> <span class="k">else</span>
+                           <span class="n">pdist</span><span class="o">.</span><span class="n">Exponential</span><span class="p">([</span><span class="n">dist_init</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]])</span>
+                           <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">sc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hmm_scheme</span><span class="p">)</span>
+                       <span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_states</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">tmatrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_states</span><span class="p">,</span> <span class="n">n_states</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">starts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_states</span><span class="p">,),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">starts</span> <span class="o">=</span> <span class="n">starts</span> <span class="o">/</span> <span class="n">starts</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">tmatrix</span> <span class="o">=</span> <span class="n">tmatrix</span> <span class="o">/</span> <span class="n">tmatrix</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">kwarg</span> <span class="o">=</span> <span class="n">_format_kwargs</span><span class="p">(</span>
+        <span class="n">pomegranate_densehmm_kwargs</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;verbose&quot;</span><span class="p">:</span>  <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;max_iter&quot;</span><span class="p">:</span>  <span class="mi">1000</span><span class="p">,</span>
+            <span class="s2">&quot;tol&quot;</span><span class="p">:</span>  <span class="n">early_stop_tol</span><span class="p">,</span>
+            <span class="s2">&quot;inertia&quot;</span><span class="p">:</span>  <span class="n">inertia</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">phmm</span><span class="o">.</span><span class="n">DenseHMM</span><span class="p">(</span>
+        <span class="n">dist_list</span><span class="p">,</span>
+        <span class="n">tmatrix</span><span class="p">,</span>
+        <span class="n">starts</span><span class="o">=</span><span class="n">starts</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwarg</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">HMMWrapper</span><span class="p">(</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">hmm_scheme</span><span class="p">,</span>
+        <span class="n">independent</span><span class="p">,</span>
+        <span class="n">hmm_name</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="fit_hmm">
+<a class="viewcode-back" href="../../../sparscit.advanced.default.html#sparscit.advanced.fit_hmm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fit_hmm</span><span class="p">(</span>
+        <span class="n">hmm</span><span class="p">:</span> <span class="n">HMMWrapper</span> <span class="o">|</span> <span class="n">HMMListWrapper</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">,</span> <span class="c1">#HMMDATA</span>
+        <span class="n">data_layers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">shuffled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">data_sample_start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">data_sample_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">pretrain_global</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fit an HMM (or HMM system) on the given data layers.</span>
+
+<span class="sd">    When an :class:`HMMListWrapper` is passed, each sub-model is trained</span>
+<span class="sd">    on its corresponding cell-type scheme.  If ``pretrain_global`` is</span>
+<span class="sd">    ``True``, a global model is trained first and its parameters are</span>
+<span class="sd">    used to initialise every sub-model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    hmm</span>
+<span class="sd">        A single :class:`HMMWrapper` or an :class:`HMMListWrapper`</span>
+<span class="sd">    data</span>
+<span class="sd">        HMMData object containing the training observations</span>
+<span class="sd">    data_layers</span>
+<span class="sd">        Layer names to use as input features</span>
+<span class="sd">    shuffled</span>
+<span class="sd">        Whether to shuffle the data before training</span>
+<span class="sd">    data_sample_start</span>
+<span class="sd">        Start index for data sub-sampling</span>
+<span class="sd">    data_sample_end</span>
+<span class="sd">        End index for data sub-sampling (``-1`` = all)</span>
+<span class="sd">    pretrain_global</span>
+<span class="sd">        Pre-train a global model and copy its weights to all sub-models</span>
+<span class="sd">        (only applicable when ``hmm`` is an :class:`HMMListWrapper`)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">is_list</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">HMMListWrapper</span><span class="p">):</span>
+        <span class="n">is_list</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fit</span><span class="p">(</span><span class="n">_hmm</span><span class="p">,</span> <span class="n">_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">scheme</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Training data size: </span><span class="si">{</span><span class="n">data_sample_end</span><span class="o">-</span><span class="n">data_sample_start</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">data_for_training</span> <span class="o">=</span> <span class="n">_data</span><span class="p">[</span><span class="n">data_sample_start</span><span class="p">:</span><span class="n">data_sample_end</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span> \
+                <span class="k">if</span> <span class="n">scheme</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_data</span><span class="p">[</span><span class="n">data_sample_start</span><span class="p">:</span><span class="n">data_sample_end</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+            <span class="n">_hmm</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data_for_training</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Stopping training...&#39;</span><span class="p">)</span>
+        <span class="n">_hmm</span><span class="o">.</span><span class="n">update_fit</span><span class="p">()</span>
+
+    <span class="n">_X</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">data_layers</span><span class="p">,</span> <span class="n">shuffled</span><span class="o">=</span><span class="n">shuffled</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_list</span><span class="p">:</span>
+        <span class="n">_fit</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">_X</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pretrain_global</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;[-------------------]&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Starting global pre-training&#39;</span><span class="p">)</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+            <span class="n">ghmm</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">wrappers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">_fit</span><span class="p">(</span><span class="n">ghmm</span><span class="p">,</span> <span class="n">_X</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">wrappers</span><span class="p">)):</span>
+                <span class="n">hmm</span><span class="o">.</span><span class="n">wrappers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">ghmm</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">sc</span> <span class="ow">in</span> <span class="n">hmm</span><span class="o">.</span><span class="n">cell_type_scheme</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;[-------------------]&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Starting training for model </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;With scheme </span><span class="si">{</span><span class="n">sc</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">_fit</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">wrappers</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">_X</span><span class="p">,</span> <span class="n">sc</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+
+
+<div class="viewcode-block" id="calculate_correlation">
+<a class="viewcode-back" href="../../../sparscit.advanced.default.html#sparscit.advanced.calculate_correlation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_correlation</span><span class="p">(</span>
+        <span class="n">hmm</span><span class="p">:</span> <span class="n">HMMWrapper</span> <span class="o">|</span> <span class="n">HMMListWrapper</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">,</span> <span class="c1">#: HMMData,</span>
+        <span class="n">data_layers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">original_data_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">reconstructed_data_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">spearman</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate correlation between original and reconstructed data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    hmm</span>
+<span class="sd">        Fitted HMM model (single or list wrapper)</span>
+<span class="sd">    data</span>
+<span class="sd">        HMMData object with reconstructed data stored in supplementary</span>
+<span class="sd">    data_layers</span>
+<span class="sd">        List of layer names</span>
+<span class="sd">    original_data_name</span>
+<span class="sd">        Name of the original data layer to correlate against</span>
+<span class="sd">    reconstructed_data_name</span>
+<span class="sd">        Name of the reconstructed data in supplementary storage</span>
+<span class="sd">    spearman</span>
+<span class="sd">        Use Spearman correlation (Pearson not yet implemented)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Array of correlation values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rd</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">supp</span><span class="p">[</span><span class="n">hmm</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">reconstructed_data</span><span class="p">[</span><span class="n">reconstructed_data_name</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">spearman</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+    <span class="n">mp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_layers</span><span class="p">)</span> <span class="o">==</span> <span class="n">original_data_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_corr</span><span class="p">([(</span><span class="n">rd</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">mp</span><span class="p">],</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">original_data_name</span><span class="p">))])</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

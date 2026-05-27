@@ -1,0 +1,708 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sparscit.tools._statistics &mdash; SparSCit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/icon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SparSCit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SparSCit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sparscit.tools._statistics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sparscit.tools._statistics</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sts</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">false_discovery_control</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax</span><span class="w"> </span><span class="kn">import</span> <span class="n">lax</span><span class="p">,</span>  <span class="n">block_until_ready</span><span class="p">,</span> <span class="n">jit</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">._layers</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_layer_feature_means</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._metabin</span><span class="w"> </span><span class="kn">import</span> <span class="n">membership_summary</span><span class="p">,</span> <span class="n">_membership_summary_on_array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._optax</span><span class="w"> </span><span class="kn">import</span> <span class="n">likelihood_ratio_test</span><span class="p">,</span> <span class="n">fit_log_regression</span><span class="p">,</span> <span class="n">LogisticParams</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._basic_stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">vectorized_chi2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._cstats</span><span class="w"> </span><span class="kn">import</span> <span class="n">mannwhitneyu_from_summary</span><span class="p">,</span> <span class="n">ranks_from_sparse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">PBar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..tools._layers</span><span class="w"> </span><span class="kn">import</span> <span class="n">LayerConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_csr_mean</span><span class="p">,</span> <span class="n">_get_memberships</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArgAssert</span>
+
+<span class="n">_test_type</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;ttest&#39;</span><span class="p">,</span> <span class="s1">&#39;chisquare&#39;</span><span class="p">,</span> <span class="s1">&#39;mannwhitneyu&#39;</span><span class="p">,</span> <span class="s1">&#39;wilcoxon&#39;</span><span class="p">,</span> <span class="s1">&#39;likelihood&#39;</span><span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">StatisticResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Container for statistical test results across features.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">test_scheme</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">score</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_len</span> <span class="o">=</span> <span class="n">data_len</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_scheme</span> <span class="o">=</span> <span class="n">test_scheme</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">res</span> <span class="o">=</span> <span class="n">res</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="n">score</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Markers</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Container for marker gene results, including top markers and enrichment statistics.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_markdown_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Markers, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> features (top markers </span><span class="si">{</span><span class="s1">&#39;not &#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">top_markers</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">determined)&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pop</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="n">names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_markers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">negative_markers</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">population</span> <span class="o">=</span> <span class="n">pop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.05</span>
+
+
+<div class="viewcode-block" id="likelihood_test_on_adata">
+<a class="viewcode-back" href="../../../sparscit.tools.html#sparscit.tools.likelihood_test_on_adata">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">likelihood_test_on_adata</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">cmpdata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">obs_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">lc</span><span class="p">:</span> <span class="n">LayerConfig</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">log_transform_for_regression</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">log_transform_covariate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">test_anti_categorical</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">mean_ranks_normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">min_lfc</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span>
+        <span class="n">min_base_mean</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run a likelihood-ratio test comparing two AnnData objects on a categorical observation.</span>
+
+<span class="sd">    Computes per-feature likelihood-ratio test statistics between groups defined by</span>
+<span class="sd">    ``obs_key``, comparing ``adata`` (group 0) against ``cmpdata`` (group 1), with</span>
+<span class="sd">    optional covariate adjustment and log-transformation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">        First AnnData (reference group)</span>
+<span class="sd">    cmpdata</span>
+<span class="sd">        Second AnnData (comparison group)</span>
+<span class="sd">    obs_key</span>
+<span class="sd">        Key in ``.obs`` defining group memberships</span>
+<span class="sd">    lc</span>
+<span class="sd">        LayerConfig specifying which layer and features to use</span>
+<span class="sd">    log_transform_for_regression</span>
+<span class="sd">        Apply log1p transform to data before regression</span>
+<span class="sd">    log_transform_covariate</span>
+<span class="sd">        Apply log transform to the covariate (total counts)</span>
+<span class="sd">    test_anti_categorical</span>
+<span class="sd">        If ``True``, compute anti-summary for the comparison group</span>
+<span class="sd">    mean_ranks_normalize</span>
+<span class="sd">        Normalize mean ranks using the first AnnData&#39;s feature means</span>
+<span class="sd">    min_lfc</span>
+<span class="sd">        Minimum log2 fold-change threshold for filtering</span>
+<span class="sd">    min_base_mean</span>
+<span class="sd">        Minimum base mean threshold for filtering</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Polars DataFrame with columns ``pval``, ``score``, ``name``, ``base_mean``, and ``group``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running likelihood test with minimum LFC=</span><span class="si">{</span><span class="n">min_lfc</span><span class="si">}</span><span class="s2">; min_base_mean=</span><span class="si">{</span><span class="n">min_base_mean</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">Xs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">Xs_with_log</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cvs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">f_names</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">()</span>
+    <span class="n">has_logtrans</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">log_transform</span>
+    <span class="k">if</span> <span class="n">has_logtrans</span> <span class="ow">and</span> <span class="p">(</span><span class="n">log_transform_covariate</span> <span class="ow">or</span> <span class="n">log_transform_for_regression</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Log_transform is True in layerconfig, log_transform_for_regression and log_transform_covariate cannot be set to true (would log transform twice)&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_adata</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">adata</span><span class="p">,</span> <span class="n">cmpdata</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">mean_ranks_normalize</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">_means</span> <span class="o">=</span> <span class="n">get_layer_feature_means</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">lc</span><span class="p">)</span> <span class="c1"># Always use first adata !</span>
+                <span class="n">lc</span><span class="o">.</span><span class="n">mean_ranks_uniform_with</span> <span class="o">=</span> <span class="n">_means</span>
+        <span class="k">if</span> <span class="n">lc</span><span class="o">.</span><span class="n">in_obsm</span><span class="p">:</span>
+            <span class="n">cva</span> <span class="o">=</span> <span class="n">_adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">lc</span><span class="o">.</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cva</span> <span class="o">=</span> <span class="n">_adata</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">lc</span><span class="o">.</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span>
+        <span class="k">if</span> <span class="n">log_transform_covariate</span><span class="p">:</span>
+            <span class="n">cva</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">cva</span><span class="p">)</span>
+        <span class="n">_anti</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">test_anti_categorical</span><span class="p">:</span>
+            <span class="n">_anti</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">cvs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_membership_summary_on_array</span><span class="p">(</span>
+            <span class="n">_adata</span><span class="p">,</span> <span class="n">obs_key</span><span class="p">,</span> <span class="n">cva</span><span class="p">,</span> <span class="n">anti_summary</span><span class="o">=</span><span class="n">_anti</span>
+        <span class="p">))</span>
+        <span class="n">xd</span> <span class="o">=</span> <span class="n">membership_summary</span><span class="p">(</span><span class="n">_adata</span><span class="p">,</span> <span class="n">lc</span><span class="p">,</span> <span class="n">obs_key</span><span class="p">,</span> <span class="n">anti_summary</span><span class="o">=</span><span class="n">_anti</span><span class="p">)</span>
+        <span class="n">Xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xd</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">log_transform_for_regression</span><span class="p">:</span>
+            <span class="c1"># Mutate </span>
+            <span class="n">xdl</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">xd</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">xdl</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">xdl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">xdl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">Xs_with_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xdl</span><span class="p">)</span>
+ 
+    <span class="n">lc</span><span class="o">.</span><span class="n">mean_ranks_uniform_with</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">ks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">Xs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="k">assert</span> <span class="n">ks</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">Xs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span> <span class="s2">&quot;obs_key must have same categoricals in both adatas&quot;</span>
+
+    <span class="n">pvals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">basemeans</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ks</span><span class="p">:</span>
+        <span class="n">X0</span> <span class="o">=</span> <span class="n">Xs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">X1</span> <span class="o">=</span> <span class="n">Xs</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">cv0</span> <span class="o">=</span> <span class="n">cvs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">cv1</span> <span class="o">=</span> <span class="n">cvs</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">data_X</span> <span class="o">=</span> <span class="n">sps</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">X0</span><span class="p">,</span> <span class="n">X1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">log_transform_for_regression</span><span class="p">:</span>
+            <span class="n">X0</span> <span class="o">=</span> <span class="n">Xs_with_log</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">X1</span> <span class="o">=</span> <span class="n">Xs_with_log</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">data_reg</span> <span class="o">=</span> <span class="n">sps</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">X0</span><span class="p">,</span> <span class="n">X1</span><span class="p">))</span>
+        <span class="n">pval</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">basemean</span> <span class="o">=</span> <span class="n">likelihood_test</span><span class="p">(</span>
+            <span class="n">data_X</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">cv0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">cv1</span><span class="p">)))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span>
+            <span class="n">covariate</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">cv0</span><span class="p">,</span> <span class="n">cv1</span><span class="p">)),</span> <span class="n">min_lfc</span> <span class="o">=</span> <span class="n">min_lfc</span><span class="p">,</span> <span class="n">min_base_mean</span><span class="o">=</span><span class="n">min_base_mean</span><span class="p">,</span> 
+            <span class="n">data_for_regression</span><span class="o">=</span><span class="n">data_reg</span> <span class="k">if</span> <span class="n">log_transform_for_regression</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">pval</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">StringDType</span><span class="p">))</span>
+        <span class="n">pvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pval</span><span class="p">)</span>
+        <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+        <span class="n">basemeans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">basemean</span><span class="p">)</span>
+
+    <span class="n">df</span><span class="o">=</span><span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">{</span><span class="s1">&#39;pval&#39;</span><span class="p">:</span> <span class="n">pvals</span><span class="p">,</span> <span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="n">scores</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">f_names</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">pvals</span><span class="p">),</span> <span class="s2">&quot;base_mean&quot;</span><span class="p">:</span> <span class="n">basemeans</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">keys</span><span class="p">}</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">explode</span><span class="p">([</span><span class="s1">&#39;pval&#39;</span><span class="p">,</span> <span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s2">&quot;base_mean&quot;</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="likelihood_test">
+<a class="viewcode-back" href="../../../sparscit.tools.html#sparscit.tools.likelihood_test">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">likelihood_test</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">sps</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">,</span>
+        <span class="n">mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">data_for_regression</span><span class="p">:</span> <span class="n">sps</span><span class="o">.</span><span class="n">csr_matrix</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">covariate</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">fdr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">min_lfc</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_base_mean</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform a likelihood-ratio test on sparse count data.</span>
+
+<span class="sd">    Compares two groups defined by ``mask`` using a covariate-adjusted</span>
+<span class="sd">    likelihood-ratio test, with optional FDR correction and fold-change</span>
+<span class="sd">    filtering.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data</span>
+<span class="sd">        Sparse count matrix (cells × features)</span>
+<span class="sd">    mask</span>
+<span class="sd">        Boolean array indicating group membership (True = group 1)</span>
+<span class="sd">    data_for_regression</span>
+<span class="sd">        Optional alternative data matrix used for regression (e.g. log-transformed)</span>
+<span class="sd">    covariate</span>
+<span class="sd">        Covariate vector (e.g. total counts) for adjustment</span>
+<span class="sd">    fdr</span>
+<span class="sd">        Apply Benjamini-Hochberg FDR correction to p-values</span>
+<span class="sd">    min_lfc</span>
+<span class="sd">        Minimum absolute log2 fold-change to include in test</span>
+<span class="sd">    min_base_mean</span>
+<span class="sd">        Minimum base mean to include in test</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple of (adjusted p-values, log2 fold-change scores, base means)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">uq</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">mask</span><span class="p">)))</span>
+    <span class="k">assert</span> <span class="n">uq</span> <span class="o">==</span> <span class="nb">set</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span> <span class="ow">or</span> <span class="n">uq</span> <span class="o">==</span> <span class="nb">set</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span> <span class="s1">&#39;Mask must only contain 0,1 or True,False&#39;</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+
+    <span class="c1">#if covariate is None:</span>
+    <span class="c1">#    covariate = np.log1p(data.sum(axis=1).A1)</span>
+    <span class="c1">#else:</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Group 1 n=</span><span class="si">{</span><span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2">, group 2 n=</span><span class="si">{</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">assert</span> <span class="n">covariate</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">_mean1</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span>
+    <span class="n">_mean0</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span>
+    <span class="n">filter_out</span> <span class="o">=</span> <span class="p">((</span><span class="n">_mean1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">_mean0</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+    <span class="n">_mean0</span><span class="p">[</span><span class="n">filter_out</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">_mean1</span><span class="p">[</span><span class="n">filter_out</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">_mean1</span> <span class="o">/</span> <span class="n">_mean0</span><span class="p">)</span>
+    <span class="n">base_means</span> <span class="o">=</span> <span class="p">(</span><span class="n">_mean1</span> <span class="o">+</span> <span class="n">_mean0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">scores</span><span class="p">[</span><span class="n">filter_out</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">base_means</span><span class="p">[</span><span class="n">filter_out</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">_fmask</span> <span class="o">=</span> <span class="o">~</span><span class="n">filter_out</span>
+    <span class="k">if</span> <span class="n">min_base_mean</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_fmask</span> <span class="o">=</span> <span class="n">_fmask</span> <span class="o">*</span> <span class="p">(</span><span class="n">base_means</span> <span class="o">&gt;</span> <span class="n">min_base_mean</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">min_lfc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_fmask</span> <span class="o">=</span> <span class="n">_fmask</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">min_lfc</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">data_for_regression</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">data_for_regression</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s2">&quot;shapes of data and data_for_regression must be same&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data_for_regression</span><span class="p">[:,</span> <span class="n">_fmask</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">_fmask</span><span class="p">]</span>
+        
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Running test on </span><span class="si">{</span><span class="n">_fmask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s1"> features. </span><span class="si">{</span><span class="n">es</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">pvals</span> <span class="o">=</span> <span class="n">_likelihood_ratio_test_many_wrapper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">covariate</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fdr</span><span class="p">:</span>
+        <span class="n">pvals</span> <span class="o">=</span> <span class="n">false_discovery_control</span><span class="p">(</span><span class="n">pvals</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bh&#39;</span><span class="p">)</span>
+
+    <span class="n">final_pvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+    <span class="n">final_pvals</span><span class="p">[</span><span class="n">_fmask</span><span class="p">]</span> <span class="o">=</span> <span class="n">pvals</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">final_pvals</span><span class="p">),</span> <span class="n">scores</span><span class="p">,</span> <span class="n">base_means</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_likelihood_ratio_test_many_wrapper</span><span class="p">(</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">sps</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">,</span>
+        <span class="n">z</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">Y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X</span>
+<span class="sd">        Data</span>
+<span class="sd">    z</span>
+<span class="sd">        Covariate</span>
+<span class="sd">    Y</span>
+<span class="sd">        Labels</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    P-values of X.shape[1] of whether adding X to the models improves the prediction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isdtype</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="s1">&#39;Y needs to be boolean&#39;</span>
+    <span class="n">X0</span> <span class="o">=</span> <span class="n">z</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">X0_jax</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X0</span><span class="p">)</span>
+    <span class="n">Y_jax</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+    <span class="n">X1_vector</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">todense</span><span class="p">())[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">_likelihood_ratio_test_many</span><span class="p">(</span><span class="n">X0_jax</span><span class="p">,</span> <span class="n">X1_vector</span><span class="p">,</span> <span class="n">Y_jax</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">))</span>
+
+<span class="nd">@partial</span><span class="p">(</span><span class="n">jit</span><span class="p">,</span> <span class="n">static_argnames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">,</span> <span class="s1">&#39;random_state&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_likelihood_ratio_test_many</span><span class="p">(</span>
+        <span class="n">X0</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">X1</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">Y</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Debug: traced _likelihood_ratio_test_many&#39;</span><span class="p">)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="n">init_s</span> <span class="o">=</span> <span class="n">LogisticParams</span><span class="p">(</span><span class="n">coef</span><span class="o">=</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,))</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span>
+    <span class="c1"># likelihood_ratio_test_vec = vmap(likelihood_ratio_test, in_axes=(None, 1, None, None))</span>
+    <span class="c1"># X1_vector = jnp.array(np.array(X.todense())[:,:,None])</span>
+    <span class="c1"># result = likelihood_ratio_test_vec(X0_jax, X1_vector, Y_jax, warm_s)</span>
+    <span class="n">warm_s</span> <span class="o">=</span> <span class="n">fit_log_regression</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">warm_params</span><span class="o">=</span><span class="n">init_s</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">process_column</span><span class="p">(</span><span class="n">X1_col</span><span class="p">):</span>
+        <span class="n">jax</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;Started batch&quot;</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">pvals</span> <span class="o">=</span> <span class="n">block_until_ready</span><span class="p">(</span><span class="n">likelihood_ratio_test</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span> <span class="n">X1_col</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">warm_s</span><span class="p">))</span>
+        <span class="n">jax</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;Finished batch&quot;</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pvals</span>
+
+    <span class="n">X1_transposed</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">X1</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">lax</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">process_column</span><span class="p">,</span> <span class="n">X1_transposed</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_interal_stat</span><span class="p">(</span>
+        <span class="n">data1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">data2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">test_type</span><span class="p">:</span> <span class="n">_test_type</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">score_f</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">scipy_stat_kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="n">scipy_stat_kwargs</span> <span class="o">=</span> <span class="n">scipy_stat_kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">_precomputed</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">score_f</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1">#_precomputed = np.log2(score_f(data1.sum(axis=0).A1) / cmpscore_f(data2.sum(axis=0).A1))</span>
+        <span class="n">_precomputed</span> <span class="o">=</span> <span class="n">score_f</span><span class="p">(</span><span class="n">data1</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span><span class="p">,</span> <span class="n">data2</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">test_type</span> <span class="o">==</span> <span class="s1">&#39;ttest&#39;</span><span class="p">:</span>
+        <span class="c1"># scores, pvals = sts.ttest_ind_from_stats(</span>
+        <span class="c1">#     mean1=_csr_mean(data1, 0),</span>
+        <span class="c1">#     std1=np.sqrt(scalar_group.var_),</span>
+        <span class="c1">#     nobs1=data1.shape[0],</span>
+        <span class="c1">#     mean2=_csr_mean(data2, 0),</span>
+        <span class="c1">#     std2=np.sqrt(scalar_rest.var_),</span>
+        <span class="c1">#     nobs2=data2.shape[0],</span>
+        <span class="c1">#     **scipy_stat_kwargs</span>
+        <span class="c1"># )</span>
+        <span class="n">_test</span> <span class="o">=</span> <span class="n">sts</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="n">data2</span><span class="p">,</span> <span class="o">**</span><span class="n">scipy_stat_kwargs</span><span class="p">)</span>
+        <span class="n">pvals</span> <span class="o">=</span> <span class="n">_test</span><span class="o">.</span><span class="n">pvalue</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">_test</span><span class="o">.</span><span class="n">statistic</span>
+        <span class="k">if</span> <span class="n">_precomputed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="n">_precomputed</span>
+        <span class="k">return</span> <span class="n">pvals</span><span class="p">,</span> <span class="n">scores</span>
+    <span class="k">elif</span> <span class="n">test_type</span> <span class="o">==</span> <span class="s1">&#39;wilcoxon&#39;</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">sts</span><span class="o">.</span><span class="n">wilcoxon</span><span class="p">(</span>
+            <span class="n">data1</span><span class="p">,</span>
+            <span class="n">data2</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">scipy_stat_kwargs</span>
+        <span class="p">)</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">statistic</span>
+        <span class="k">if</span> <span class="n">_precomputed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="n">_precomputed</span>
+        <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">pvalue</span><span class="p">,</span> <span class="n">scores</span>
+    <span class="k">elif</span> <span class="n">test_type</span> <span class="o">==</span> <span class="s1">&#39;mannwhitneyu&#39;</span><span class="p">:</span>
+        <span class="n">ArgAssert</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">data1</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">data2</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span>
+            <span class="s2">&quot;Data can&#39;t be binary for mannwhitneyu&quot;</span>
+        <span class="p">)</span>
+        <span class="n">scores</span><span class="p">,</span> <span class="n">pvals</span> <span class="o">=</span> <span class="n">sts</span><span class="o">.</span><span class="n">mannwhitneyu</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="n">data2</span><span class="p">,</span> <span class="o">**</span><span class="n">scipy_stat_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_precomputed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="n">_precomputed</span>
+        <span class="k">return</span> <span class="n">pvals</span><span class="p">,</span> <span class="n">scores</span>
+    <span class="k">elif</span> <span class="n">test_type</span> <span class="o">==</span> <span class="s1">&#39;chisquare&#39;</span><span class="p">:</span>
+        <span class="n">ArgAssert</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">data1</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">data2</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span>
+            <span class="s1">&#39;Data needs to be binary for chisquared test&#39;</span>
+        <span class="p">)</span>
+        <span class="n">scores</span><span class="p">,</span> <span class="n">pvals</span> <span class="o">=</span> <span class="n">vectorized_chi2</span><span class="p">(</span>
+            <span class="n">data1</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span><span class="p">,</span>
+            <span class="n">data1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">data2</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span><span class="p">,</span>
+            <span class="n">data2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">_precomputed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="n">_precomputed</span>
+        <span class="k">return</span> <span class="n">pvals</span><span class="p">,</span> <span class="n">scores</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;test &#39;</span><span class="si">{</span><span class="n">test_type</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="statistic_test">
+<a class="viewcode-back" href="../../../sparscit.tools.html#sparscit.tools.statistic_test">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">statistic_test</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">test_scheme</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">test_type</span><span class="p">:</span> <span class="n">_test_type</span> <span class="o">=</span> <span class="s1">&#39;ttest&#39;</span><span class="p">,</span>
+        <span class="n">fdc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">welch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">scipy_stat_kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">raw_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatisticResult</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create :class:´StatisticResult´ using one of supported statistical tests.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data</span>
+<span class="sd">        List of numpy arrays, data from different groups to compare</span>
+<span class="sd">    test_scheme</span>
+<span class="sd">        Scheme of testing, list of tuples. Example: test_scheme=[(0,1)] means 0th and 1st data should be compared</span>
+<span class="sd">    test_type</span>
+<span class="sd">        One of &#39;ttest&#39;, &#39;chisquare&#39;, &#39;mannwhitneyu&#39;, &#39;wilcoxon&#39;</span>
+<span class="sd">    fdc</span>
+<span class="sd">        Whether to control for false discovery rate using Benjamini-Hochberg</span>
+<span class="sd">    welch</span>
+<span class="sd">        If T-test, whether it should be Welch&#39;s T-test</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:´StatisticResult´</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">_kwargs</span> <span class="o">=</span> <span class="n">scipy_stat_kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">welch</span><span class="p">:</span>
+        <span class="n">_kwargs</span><span class="p">[</span><span class="s1">&#39;equal_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">ts</span> <span class="ow">in</span> <span class="n">test_scheme</span><span class="p">:</span>
+        <span class="n">_res</span><span class="p">,</span> <span class="n">_score</span> <span class="o">=</span> <span class="n">_interal_stat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">]]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">ts</span><span class="p">[</span><span class="mi">1</span><span class="p">]]),</span> <span class="n">test_type</span><span class="p">,</span> <span class="n">scipy_stat_kwargs</span><span class="o">=</span><span class="n">_kwargs</span><span class="p">)</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_res</span><span class="p">)</span>
+        <span class="n">score</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_score</span><span class="p">)</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+    <span class="n">res</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">fdc</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">sts</span><span class="o">.</span><span class="n">false_discovery_control</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bh&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">raw_output</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">res</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">StatisticResult</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">test_scheme</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">score</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">score</span><span class="p">))</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_adata_test</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">sps</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">,</span>
+        <span class="n">obs_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">var_names</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">test_type</span><span class="p">:</span> <span class="n">_test_type</span> <span class="o">=</span> <span class="s1">&#39;ttest&#39;</span><span class="p">,</span>
+        <span class="n">fdc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">rank_based_fc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">score_f</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cmpadata</span><span class="p">:</span> <span class="n">AnnData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cmpdata</span><span class="p">:</span> <span class="n">sps</span><span class="o">.</span><span class="n">csr_matrix</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">covariates</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">cats</span><span class="p">,</span> <span class="n">cat_names</span><span class="p">,</span> <span class="n">uq_cats</span> <span class="o">=</span> <span class="n">_get_memberships</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">obs_key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cmpadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cats_c</span><span class="p">,</span> <span class="n">cat_names_c</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_get_memberships</span><span class="p">(</span><span class="n">cmpadata</span><span class="p">,</span> <span class="n">obs_key</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">cat_names_c</span> <span class="o">==</span> <span class="n">cat_names</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s1">&#39;categories do not match in adata/cmpdata&#39;</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">pdatas</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">test_scheme</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="n">PBar</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">uq_cats</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">as</span> <span class="n">bar</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">uq_cats</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">cats</span> <span class="o">==</span> <span class="n">c</span>
+            <span class="n">thisdata</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+
+            <span class="n">_covariates</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">cmpdata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">restdata</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">covariates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">_covariates</span> <span class="o">=</span> <span class="p">[</span><span class="n">covariates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">mask</span><span class="p">],</span> <span class="n">covariates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">~</span><span class="n">mask</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">restdata</span> <span class="o">=</span> <span class="n">cmpdata</span><span class="p">[</span><span class="n">cats_c</span> <span class="o">==</span> <span class="n">c</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">covariates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">_covariates</span> <span class="o">=</span> <span class="p">[</span><span class="n">covariates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">mask</span><span class="p">],</span> <span class="n">covariates</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">cats_c</span> <span class="o">==</span> <span class="n">c</span><span class="p">]]</span>
+
+            <span class="n">pvals</span><span class="p">,</span> <span class="n">scores</span> <span class="o">=</span> <span class="n">_interal_stat</span><span class="p">(</span>
+                <span class="n">thisdata</span><span class="p">,</span> <span class="n">restdata</span><span class="p">,</span> <span class="n">test_type</span><span class="p">,</span> <span class="n">covariates</span><span class="o">=</span><span class="n">_covariates</span><span class="p">,</span> <span class="n">rank_based_fc</span><span class="o">=</span><span class="n">rank_based_fc</span><span class="p">,</span>
+                <span class="n">score_f</span><span class="o">=</span><span class="n">score_f</span>
+            <span class="p">)</span>
+
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pvals</span><span class="p">,</span> <span class="n">scores</span><span class="p">))</span>
+            <span class="n">bar</span><span class="o">.</span><span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">bar</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+
+    <span class="n">pvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">res</span><span class="p">])</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">res</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">fdc</span><span class="p">:</span>
+        <span class="n">pvals</span> <span class="o">=</span> <span class="n">sts</span><span class="o">.</span><span class="n">false_discovery_control</span><span class="p">(</span><span class="n">pvals</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bh&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">uq_cats</span><span class="p">,</span>
+            <span class="s1">&#39;res&#39;</span><span class="p">:</span> <span class="n">pvals</span><span class="p">,</span>
+            <span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="n">scores</span><span class="p">,</span>
+            <span class="s1">&#39;var_name&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">var_names</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">uq_cats</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">explode</span><span class="p">([</span><span class="s1">&#39;res&#39;</span><span class="p">,</span> <span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="s1">&#39;var_name&#39;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="filter_top_markers">
+<a class="viewcode-back" href="../../../sparscit.tools.html#sparscit.tools.filter_top_markers">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">filter_top_markers</span><span class="p">(</span>
+        <span class="n">markers</span><span class="p">:</span> <span class="n">Markers</span><span class="p">,</span>
+        <span class="n">n_top</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+        <span class="n">keep_only_significant</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">negative_markers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pick top markers for each category.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    markers</span>
+<span class="sd">        :class:`Markers`</span>
+<span class="sd">    n_top</span>
+<span class="sd">        Number of top markers</span>
+<span class="sd">    alpha</span>
+<span class="sd">        Maximum p-value</span>
+<span class="sd">    keep_only_significant</span>
+<span class="sd">        Purge unsignificant results</span>
+<span class="sd">    negative_markers</span>
+<span class="sd">        Find negative markers instead of positive ones</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">markers</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+    <span class="n">markers</span><span class="o">.</span><span class="n">negative_markers</span> <span class="o">=</span> <span class="n">negative_markers</span>
+    <span class="n">markers</span><span class="o">.</span><span class="n">top_markers</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">uqs</span> <span class="o">=</span> <span class="n">markers</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">sclause</span> <span class="o">=</span> <span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;score&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">negative_markers</span> <span class="k">else</span> <span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;score&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">uq</span> <span class="ow">in</span> <span class="n">uqs</span><span class="p">:</span>
+        <span class="n">_df</span> <span class="o">=</span> <span class="n">markers</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">uq</span><span class="p">)</span>
+            <span class="o">&amp;</span> <span class="n">sclause</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s1">&#39;res&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">keep_only_significant</span><span class="p">:</span>
+            <span class="n">_df</span> <span class="o">=</span> <span class="n">_df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;res&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">alpha</span><span class="p">)</span>
+        <span class="n">_df</span> <span class="o">=</span> <span class="n">_df</span><span class="o">.</span><span class="n">top_k</span><span class="p">(</span><span class="n">n_top</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s1">&#39;res&#39;</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">pvals</span> <span class="o">=</span> <span class="n">_df</span><span class="p">[</span><span class="s1">&#39;res&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">pm</span> <span class="o">=</span> <span class="n">pvals</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">pm</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="n">markers</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="n">uq</span><span class="p">]</span><span class="si">}</span><span class="s1">] Some (</span><span class="si">{</span><span class="n">pm</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s1">) p-values are extremely small (equal to zero)&#39;</span><span class="p">)</span>
+
+        <span class="n">pvals</span><span class="p">[</span><span class="n">pm</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">lpvals</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">pvals</span><span class="p">)</span>
+        <span class="n">markers</span><span class="o">.</span><span class="n">top_markers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">markers</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="n">uq</span><span class="p">],</span>
+                <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="n">_df</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+                        <span class="s1">&#39;pval&#39;</span><span class="p">:</span> <span class="n">_df</span><span class="p">[</span><span class="s1">&#39;res&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+                        <span class="s1">&#39;nlog_p&#39;</span><span class="p">:</span> <span class="n">lpvals</span><span class="p">,</span>
+                        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">_df</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                    <span class="p">}</span>
+                <span class="p">)</span> <span class="k">if</span> <span class="n">lpvals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="enriched_in_group">
+<a class="viewcode-back" href="../../../sparscit.tools.html#sparscit.tools.enriched_in_group">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">enriched_in_group</span><span class="p">(</span>
+        <span class="n">adata</span><span class="p">:</span> <span class="n">AnnData</span><span class="p">,</span>
+        <span class="n">layer</span><span class="p">:</span> <span class="n">LayerConfig</span><span class="p">,</span>
+        <span class="n">obs_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">binarize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">likelihood_test</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">fdc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Markers</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate enriched features in layer, comparing each categorical to the rest.</span>
+<span class="sd">    When binarize=True is passed, use chi squared test, otherwise use Mann-Whitney U.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata</span>
+<span class="sd">    layer</span>
+<span class="sd">        LayerConfig</span>
+<span class="sd">    obs_key</span>
+<span class="sd">        Categorical key</span>
+<span class="sd">    binarize</span>
+<span class="sd">        Binarize layer</span>
+<span class="sd">    fdc</span>
+<span class="sd">        Whether to use false-discovery control (BH)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`Markers`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_var_names</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">()</span>
+    <span class="n">cats</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">obs_key</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">cat_names</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">obs_key</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">binarize</span><span class="o">=</span><span class="n">binarize</span><span class="p">)</span>
+
+    <span class="n">test</span><span class="p">:</span> <span class="n">_test_type</span>
+    <span class="k">if</span> <span class="n">binarize</span><span class="p">:</span>
+        <span class="n">test</span> <span class="o">=</span> <span class="s1">&#39;chisquare&#39;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">likelihood_test</span> <span class="k">else</span> <span class="s1">&#39;likelihood&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">test</span> <span class="o">=</span> <span class="s1">&#39;mannwhitneyu&#39;</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">_adata_test</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">layer</span><span class="o">.</span><span class="n">cached_mask</span><span class="p">],</span> <span class="n">obs_key</span><span class="p">,</span> <span class="n">_var_names</span><span class="p">,</span> <span class="n">fdc</span><span class="o">=</span><span class="n">fdc</span><span class="p">,</span> <span class="n">test_type</span><span class="o">=</span><span class="n">test</span><span class="p">,</span> <span class="n">covariate</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">Markers</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cat_names</span><span class="p">,</span> <span class="n">_var_names</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, alepur lourinhos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

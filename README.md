@@ -4,6 +4,15 @@
 
 SparSCit is a Python library for processing, analyzing, and visualizing single-cell histone modification sequencing data (such as NanoC&T, scCUT&Tag, scChIP-seq). It provides a complete pipeline from raw fragment loading through embedding, clustering, landscape visualization, and statistical testing — all built on top of [AnnData](https://anndata.readthedocs.io/).
 
+
+---
+
+## Software & Hardware
+
+Please see [`example_setup.txt`](example_setup.txt) for the pip venv and operating system this package has been tested on.
+Most of the code can be run on a normal PC (here, we ran it on NixOS on Ultra 5 ThinkPad). However, SCGLUE related, and logistic regression fitting code 
+was run on Alvis GPU cluster through NAISS on one NVIDIA A100. 
+
 ---
 
 ## Installation
@@ -18,6 +27,8 @@ For development:
 pip install -e .
 ```
 
+Typical time required: <10 minutes, if Python is already available, 30 min if on MacOS or Windows with no previous Python.
+
 ### Requirements
 
 - Python ≥ 3.10
@@ -25,6 +36,13 @@ pip install -e .
 
 See [`requirements.txt`](requirements.txt) for the full list.
 
+
+---
+
+
+## Demo
+
+A demo is available in `github:AlePur/epigenetic_landscape_analysis_notebooks`, where the demo notebooks contain expected outputs. Running the demo takes 10 minutes if this package has already been installed.
 
 ---
 
